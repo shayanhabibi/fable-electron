@@ -5,9 +5,12 @@
         <IsPackable>false</IsPackable>
     </PropertyGroup>
     <ItemGroup>
+      <Content Include="ci\cache.json" />
       <Compile Include="ci\Spec.fs" />
       <Compile Include="ci\lib\GhClient.fs" />
       <Compile Include="ci\lib\Electron.fs" />
+      <Compile Include="ci\lib\Workers.fs" />
+      <Compile Include="ci\lib\TargetOperators.fs" />
       <Compile Include="ci\Build.fs" />
       <Content Include="ci\README.md" />
     </ItemGroup>
