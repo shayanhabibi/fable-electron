@@ -77,6 +77,14 @@ Target.create Ops.downloadInput <| fun _ ->
             Electron.downloadRelease value
     getUserInput ()
     |> run
+Target.create Ops.downloadLatest <| fun _ ->
+    Electron.tryGetRelease _.isLatest
+    |> function
+        | Some release ->
+            Status.setRelease release
+            Electron.downloadRelease release
+        | None ->
+            failwith "Was not able to identify the latest release using the 'gh' cli."
 Target.create Ops.postDownload (ignore >> Laundry.clean)
 Target.create Ops.generate <| fun _ ->
     Electron.generate()
@@ -140,8 +148,8 @@ Target.create Ops.testGitNet <| fun para ->
         |> fst
         |> Seq.map _.ToString()
         |> Trace.logItems "The following packages were updated:\n"
-        Target.runSimpleWithContext Ops.push para.Context
-        |> ignore
+        // Target.runSimpleWithContext Ops.push para.Context
+        // |> ignore
     | true, true when para.Context.HasError || isMajorChange || isMinorChange ->
         Laundry.createBranch $"ci/electron/{Status.getRelease().tagName}"
         let commitMessage =
@@ -180,11 +188,36 @@ Target.create Ops.testGitNet <| fun para ->
                 )
             |> dict
         runtime.VersionProjects(gitnetRun, true)
-        runtime.CommitChanges(message = commitMessage)
+        runtime.CommitChanges()
         runtime.CommitTags(gitnetRun.Values)
         runtime.DryRun()
         |> snd
         |> runtime.WriteToOutputAndCommit
+        Laundry.pushCurrentBranch()
+        let title =
+            if para.Context.HasError then
+                "[GEN ERROR] For "
+            else ""
+            + "Electron " + Status.getRelease().tagName
+        let body =
+            if para.Context.HasError then
+                "The generation for this build failed and requires \
+                some changes to allow tests to pass.
+ \
+                Once those changes have been made, and tests pass, you can \
+                merge this pull."
+            else
+                "Once you are happy to proceed and tests are passing, you \
+                can merge this pull to 'develop' and pull to 'main' whenever \
+                you want to publish the packages."
+        Laundry.sendPullForDevel title body
+    | true, true when not para.Context.HasError ->
+        Laundry.commitFiles $"fix: Update bindings; electron {Status.getRelease().tagName}" files
+        runtime.Run() |> fst
+        |> Trace.logf "The following packages were updated:\n%A"
+    | _ ->
+        Trace.logf "No package changes were made"
+        
 // Target.create Ops.cron <| fun para ->
 // Relevant files
 
@@ -206,6 +239,7 @@ let main argsv =
             Ops.changelogGen
             Ops.downloadApi
             Ops.downloadInput
+            Ops.downloadLatest
             Ops.listDetailedReleases
             Ops.listReleases
             Ops.generate
@@ -213,6 +247,11 @@ let main argsv =
             Ops.test
             Ops.format
         ]
+        Ops.testGitNet <== [
+            Ops.postDownload
+            Ops.downloadLatest
+        ]
+            
         [
             // define setup requirements
             Ops.setupTest
@@ -228,10 +267,25 @@ let main argsv =
                 Ops.build
                 Ops.pack
                 Ops.push
+                Ops.testGitNet
+                Ops.postDownload
             ]
-            
+            // On the other hand, generate has plenty of soft dependencies itself
+            Ops.generate <==? [
+                Ops.downloadApi
+                Ops.downloadInput
+                Ops.downloadLatest
+            ]
+            Ops.generate
+            Ops.generate ==> Ops.testGitNet
             Ops.setupDocs
             =?> (Ops.docs, not Args.quick)
+            
+            Ops.postDownload <==? [
+                Ops.downloadApi
+                Ops.downloadInput
+                Ops.downloadLatest
+            ]
             
         ]
     let run =

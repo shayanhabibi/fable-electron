@@ -58,6 +58,7 @@ module Ops =
     let [<Literal>] listDetailedReleases = "list-detailed-releases"
     /// Download a specified release
     let [<Literal>] downloadApi = "download-api"
+    let [<Literal>] downloadLatest = "download-latest"
     /// Combines list releases and download api interactively
     let [<Literal>] downloadInput = "download-input"
     /// Post download cleanup
