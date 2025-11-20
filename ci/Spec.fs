@@ -1,8 +1,11 @@
 ﻿module Spec
 
+open System.IO
 open EasyBuild.FileSystemProvider
 open Fake.Core
 open Fake.Core.Context
+open Fake.IO
+open Partas.GitNet
 
 [<Literal>]
 let _rootPath = __SOURCE_DIRECTORY__ + "/.."
@@ -33,6 +36,7 @@ module Projects =
     let Electron = Folders.Electron.``Fable.Electron.fsproj``
     let Forge = Folders.Forge.``Fable.Electron.Forge.fsproj``
     let Test = Folders.Tests.``Fable.Electron.Remoting.Tests``.``Fable.Electron.Remoting.Tests.fsproj``
+    let Docs = Root.docs.``Docs.fsproj``
 
 module Solutions =
     let Electron = Root.``Fable.Electron.sln``
@@ -88,6 +92,7 @@ module Ops =
     let [<Literal>] cron = "cron"
     let [<Literal>] changelogGen = "changelog-gen"
     let [<Literal>] loadCache = "load-cache"
+    let [<Literal>] testGitNet = "test-gitnet"
     module Args =
         let [<Literal>] help = "--help"
         let [<Literal>] detailed = "--detailed"
@@ -149,8 +154,11 @@ Usage:
     Build.exe {Commands.generateApiDocs} [options]
     Build.exe {Commands.pack} [options]
     Build.exe {Commands.cron} [options]
-    Build.exe {Commands.run} [--target <NAME>] [options]
+    Build.exe {Commands.run} [run] [options]
     Build.exe {Commands.publish} [publish] [options]
+
+Run Options [run]:
+    --target <NAME>         The target to run
 
 Publish Targets [publish]:
     --forge                 Pack and publish the Fable.Electron.Forge package

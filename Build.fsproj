@@ -11,6 +11,7 @@
       <Compile Include="ci\lib\Electron.fs" />
       <Compile Include="ci\lib\Workers.fs" />
       <Compile Include="ci\lib\TargetOperators.fs" />
+      <Compile Include="ci\lib\GitNet.fs" />
       <Compile Include="ci\Build.fs" />
       <Content Include="ci\README.md" />
     </ItemGroup>
@@ -24,6 +25,7 @@
       <PackageReference Include="Fake.DotNet.Fsdocs" Version="6.1.4" />
       <PackageReference Include="Fake.JavaScript.Npm" Version="6.1.4" />
       <PackageReference Include="Fake.Tools.Git" Version="6.1.4" />
+      <PackageReference Include="Partas.GitNet" Version="0.1.2" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="src\ElectronApi.Json.Parser\ElectronApi.Json.Parser.fsproj" />
