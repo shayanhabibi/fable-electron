@@ -85,11 +85,21 @@ let private gitnetConfig = {
 }
 
 let runtime = new GitNetRuntime(gitnetConfig)
-let private initialCompute, _ = runtime.DryRun()
+let private initialCompute = runtime.DryRun()
+let private getInitialVersion scope =
+    match initialCompute.Versions.TryGetValue(scope) with
+    | true, semver ->
+        semver
+        |> ValueOption.bind GitNetTag.chooseSemverCompatible
+    | _ -> ValueNone
 let private getInitialBump scope =
-    match initialCompute.TryGetValue(scope) with
+    match initialCompute.Bumps.TryGetValue(scope) with
     | true, semver -> ValueSome semver
     | _ -> ValueNone
+let getInitVersionForge = getInitialVersion "Forge"
+let getInitVersionElectron = getInitialVersion "Electron"
+let getInitVersionRemoting = getInitialVersion "Remoting"
 let getInitBumpForge = getInitialBump "Forge"
 let getInitBumpElectron = getInitialBump "Electron"
 let getInitBumpRemoting = getInitialBump "Remoting"
+

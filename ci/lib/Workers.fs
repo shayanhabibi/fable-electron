@@ -12,6 +12,7 @@ open Fake.IO
 open Fake.Tools
 open Fake.JavaScript
 open Fake.Tools.Git
+open GitNet
 open Octokit
 open Spec
 
@@ -95,11 +96,13 @@ module Laundry =
     
     let branchName () = Git.Information.getBranchName root
     
-    let pushCurrentBranch = branchName >> pushBranch
+    let pushCurrentBranch =
+        branchName >> pushBranch
     
-    let createBranch branchName =
-        Git.Information.getCurrentShortSHA1 root
-        |> Git.Branches.createBranch root branchName
+    let createBranch newBranchName =
+        Git.Branches.checkoutNewBranch root (branchName()) newBranchName 
+        // Git.Information.getCurrentShortSHA1 root
+        // |> Git.Branches.createBranch root branchName
     
     let commitFiles msg files =
         files
@@ -112,10 +115,10 @@ module Laundry =
     let private createPullForMain = createNewPull "main"
     
     let sendPullForDevel title = createPullForDevel title >> fun pull ->
-        withGithubClient (GitHub.createPullRequest "fable-hub" "fable-electron" pull)
+        withGithubClient (GitHub.createPullRequest "shayanhabibi" "fable-electron" pull)
         |> ignore
     let sendPullForMain title = createPullForMain title >> fun pull ->
-        withGithubClient (GitHub.createPullRequest "fable-hub" "fable-electron" pull)
+        withGithubClient (GitHub.createPullRequest "shayanhabibi" "fable-electron" pull)
         |> ignore
     
     let tagBranch tag = Branches.tag root tag
@@ -130,63 +133,48 @@ module Laundry =
             | result -> Trace.log $"Errors while formatting all files: %A{result.Messages}"
     
 module Changelog =
+    open Partas.GitNet
+    open Partas.Tools.SepochSemver
+    
     let private file = FileInfo(Root.``RELEASE_NOTES.md``)
-    let getCurrentVersion () =
-        Changelog.findLastVersion file |> SemVer.parse
-    let getNextVersionFromSemVerAndReleaseInfo semver releaseInfo =
+    let getCurrentVersion () = getInitVersionElectron
+    let getNextVersionFromSemVerAndReleaseInfo (semver: GitNetTag voption) releaseInfo =
+        let semver =
+            match semver with
+            | ValueSome(GitNetTag.GitNetTag { SepochSemver = { SemVer = semver } })
+            | ValueSome(GitNetTag.SemVerTag { Semver = semver }) ->
+                { Sepoch = Sepoch.Scope "Electron"; SemVer = semver }
+            | _ -> { Sepoch = Sepoch.Scope "Electron"; SemVer = Semver.SemVersion(0,1,0) }
         let tag = releaseInfo.tagName.TrimStart 'v'
         if SemVer.isValid tag |> not then
             failwith $"The downloaded electron-api comes from a release with an invalid semver for a tag: {tag}"
         else
         let releaseVersion = SemVer.parse tag
-        match releaseVersion, semver with
-        | { Patch = releasePatch }, { Patch = currentPatch }
-            when releaseVersion.Major = semver.Major
-                && releaseVersion.Minor = semver.Minor ->
-            { releaseVersion with
-                Patch = if currentPatch >= releasePatch then currentPatch + 1u else releasePatch }
+        match releaseVersion with
+        | { Patch = releasePatch }
+            when bigint releaseVersion.Major = semver.SemVer.Major
+                && bigint releaseVersion.Minor = semver.SemVer.Minor ->
+            SepochSemver.Bump(semver, patch = if semver.SemVer.Patch >= bigint releasePatch then int semver.SemVer.Patch + 1 else int releasePatch)
             |> Ok
-        | { Major = releaseMajor; Minor = releaseMinor },
-            { Major = currentMajor; Minor = currentMinor }
-            when releaseMajor > currentMajor || (releaseMinor > currentMinor && releaseMajor >= currentMajor) ->
-            releaseVersion |> Ok
-        | _, currentVersion ->
+        | { Major = releaseMajor; Minor = releaseMinor }
+            when bigint releaseMajor > semver.SemVer.Major || (bigint releaseMinor > semver.SemVer.Minor && bigint releaseMajor >= semver.SemVer.Major) ->
+            {
+                Sepoch = semver.Sepoch
+                SemVer = Semver.SemVersion(releaseVersion.Major, releaseVersion.Minor, releaseVersion.Patch)
+            } |> Ok
+        | _ ->
             $"Unexpected version collision where the current version is \
                 higher than the generated version: \n \
-                Current: {currentVersion}\n Generated: {releaseVersion}"
+                Current: {semver}\n Generated: {releaseVersion}"
             |> Error
     let tryGetNextSemVer =
-        getCurrentVersion()
+        getInitVersionElectron
         |> getNextVersionFromSemVerAndReleaseInfo
     let getNextSemVer =
         tryGetNextSemVer
         >> function
             | Ok value -> value
             | Error e -> failwith e
-    
-    let runWithSemVer (semVer: SemVerInfo) =
-        ChangelogGen.tryRun (
-            file,
-            forceVersion = semVer.AsString,
-            skipInvalidCommit = true,
-            tagFilter = [ "Fable.Electron" ]
-            )
-        |> function
-            | ChangelogGenResult.Error e ->
-                $"Failed to generate changelog for %A{semVer}: %s{e}"
-                |> Error
-            | ChangelogGenResult.NewVersion version ->
-                Some version
-                |> Ok
-            | ChangelogGenResult.NoVersionBump ->
-                Ok None
-    let runForElectron () =
-        ChangelogGen.tryRun(
-            file,
-            skipInvalidCommit = true,
-            tagFilter = [ "Fable.Electron" ]
-            )
-        
         
 module Electron =
     let private apiFile = VirtualRoot.temp.``electron-api.json``

@@ -75,6 +75,7 @@ Target.create Ops.downloadInput <| fun _ ->
         | Some value ->
             Status.setRelease value
             Electron.downloadRelease value
+    Electron.listReleases true
     getUserInput ()
     |> run
 Target.create Ops.downloadLatest <| fun _ ->
@@ -144,8 +145,7 @@ Target.create Ops.testGitNet <| fun para ->
     | false, _ when getInitBumpRemoting.IsNone && getInitBumpForge.IsNone && not para.Context.HasError ->
         Trace.log "No changes during CI."
     | false, _ when not para.Context.HasError ->
-        runtime.Run()
-        |> fst
+        runtime.Run().Bumps
         |> Seq.map _.ToString()
         |> Trace.logItems "The following packages were updated:\n"
         // Target.runSimpleWithContext Ops.push para.Context
@@ -166,33 +166,24 @@ Target.create Ops.testGitNet <| fun para ->
                 ""
             ] |> String.concat "\n"
         Laundry.commitFiles commitMessage files
-        let gitnetRun =
-            runtime.DryRun()
-            |> fst
-            |> Seq.choose(
-                fun keyValue ->
-                    match keyValue.Key with
-                    // we have to manually edit the 
-                    | "Electron" as key when isMajorChange || isMinorChange ->
-                        let semver = Status.getSemver()
-                        (key, Partas.Tools.SepochSemver.
-                        SepochSemver.Bump(
-                            keyValue.Value,
-                            major = int semver.Major, 
-                            minor = int semver.Minor,
-                            patch = int semver.Patch
-                            )
-                        )
-                        |> Some
-                    | key -> Some(key, keyValue.Value)
-                )
-            |> dict
-        runtime.VersionProjects(gitnetRun, true)
-        runtime.CommitChanges()
-        runtime.CommitTags(gitnetRun.Values)
-        runtime.DryRun()
-        |> snd
-        |> runtime.WriteToOutputAndCommit
+        let next =
+            Status.getRelease()
+            |> Changelog.getNextSemVer
+        runtime.Run(fun bumps _ ->
+            if bumps.ContainsKey "Electron" then
+                bumps |> Seq.map(function
+                    | KeyValue("Electron", _) -> "Electron", next
+                    | KeyValue(key,value) -> key,value)
+                |> dict
+            else
+                seq {
+                    yield! bumps
+                    KeyValuePair("Electron", next)
+                }
+                |> Seq.map(fun kv -> kv.Key, kv.Value)
+                |> dict
+            )
+        |> ignore
         Laundry.pushCurrentBranch()
         let title =
             if para.Context.HasError then
@@ -213,7 +204,7 @@ Target.create Ops.testGitNet <| fun para ->
         Laundry.sendPullForDevel title body
     | true, true when not para.Context.HasError ->
         Laundry.commitFiles $"fix: Update bindings; electron {Status.getRelease().tagName}" files
-        runtime.Run() |> fst
+        runtime.Run().Bumps 
         |> Trace.logf "The following packages were updated:\n%A"
     | _ ->
         Trace.logf "No package changes were made"
