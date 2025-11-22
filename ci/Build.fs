@@ -145,7 +145,7 @@ Target.create Ops.testGitNet <| fun para ->
     | false, _ when getInitBumpRemoting.IsNone && getInitBumpForge.IsNone && not para.Context.HasError ->
         Trace.log "No changes during CI."
     | false, _ when not para.Context.HasError ->
-        runtime.Run().Bumps
+        runtime.Run(appendCommit = true).Bumps
         |> Seq.map _.ToString()
         |> Trace.logItems "The following packages were updated:\n"
         // Target.runSimpleWithContext Ops.push para.Context
@@ -169,7 +169,7 @@ Target.create Ops.testGitNet <| fun para ->
         let next =
             Status.getRelease()
             |> Changelog.getNextSemVer
-        runtime.Run(fun bumps _ ->
+        runtime.Run((fun bumps _ ->
             if bumps.ContainsKey "Electron" then
                 bumps |> Seq.map(function
                     | KeyValue("Electron", _) -> "Electron", next
@@ -181,7 +181,8 @@ Target.create Ops.testGitNet <| fun para ->
                     KeyValuePair("Electron", next)
                 }
                 |> Seq.map(fun kv -> kv.Key, kv.Value)
-                |> dict
+                |> dict),
+                appendCommit = true
             )
         |> ignore
         Laundry.pushCurrentBranch()
@@ -204,7 +205,7 @@ Target.create Ops.testGitNet <| fun para ->
         Laundry.sendPullForDevel title body
     | true, true when not para.Context.HasError ->
         Laundry.commitFiles $"fix: Update bindings; electron {Status.getRelease().tagName}" files
-        runtime.Run().Bumps 
+        runtime.Run(appendCommit = true).Bumps 
         |> Trace.logf "The following packages were updated:\n%A"
     | _ ->
         Trace.logf "No package changes were made"
