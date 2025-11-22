@@ -100,7 +100,9 @@ module Laundry =
         branchName >> pushBranch
     
     let createBranch newBranchName =
-        Git.Branches.checkoutNewBranch root (branchName()) newBranchName 
+        Git.Stash.push root "[ci stash]"
+        Git.Branches.checkoutNewBranch root (branchName()) newBranchName
+        Git.Stash.pop root
         // Git.Information.getCurrentShortSHA1 root
         // |> Git.Branches.createBranch root branchName
     
