@@ -182,9 +182,10 @@ Target.create Ops.testGitNet <| fun para ->
                 }
                 |> Seq.map(fun kv -> kv.Key, kv.Value)
                 |> dict),
-                appendCommit = true
+                commit = false
             )
         |> ignore
+        Laundry.commitFiles "[skip ci]\n\nupdate RELEASE_NOTES" [ Root.``RELEASE_NOTES.md`` ]
         Laundry.pushCurrentBranch()
         let title =
             if para.Context.HasError then
