@@ -9,7 +9,7 @@ open Partas.GitNet
 
 [<Literal>]
 let _rootPath = __SOURCE_DIRECTORY__ + "/.."
-
+//%FileProvider%START%
 type Root = AbsoluteFileSystem<_rootPath>
 
 type VirtualRoot =
@@ -21,7 +21,7 @@ temp
     electron-api.json
 """
      >
-
+//%FileProvider%END% //%PredefinedFileProvider%START%
 module Projects =
     module Folders =
         type Remoting = Root.src.``Fable.Electron.Remoting``
@@ -44,27 +44,27 @@ module Solutions =
 module Files =
     let Api = VirtualRoot.temp.``electron-api.json``
     let Cache = Root.ci.``cache.json``
-
-
-
+//%PredefinedFileProvider%END% //%TargetsExample%START%
 module Ops =
     /// Clean directories from build material, and temporary files downloaded such as electron-api.json
     let [<Literal>] clean = "clean"
     /// Clean directories from fable generated files
     let [<Literal>] fableClean = "fable-clean"
     /// List releases from electron
-    let [<Literal>] listReleases = "list-releases"
+    let [<Literal>] listReleases = "list-releases" //%TargetsExample%END%
     /// List releases from electron with details
     let [<Literal>] listDetailedReleases = "list-detailed-releases"
+    //%DownloadTargets%START%
     /// Download a specified release
     let [<Literal>] downloadApi = "download-api"
     let [<Literal>] downloadLatest = "download-latest"
     /// Combines list releases and download api interactively
-    let [<Literal>] downloadInput = "download-input"
+    let [<Literal>] downloadInput = "download-input" //%DownloadTargets%END%
     /// Post download cleanup
     let [<Literal>] postDownload = "post-download-clean"
     /// Generate the Fable.Electron bindings
     let [<Literal>] generate = "generate"
+    let [<Literal>] activateGitnet = "activate-gitnet"
     /// Setup docs via npm i or npm ci
     let [<Literal>] setupDocs = "setup-docs"
     /// Run docs in watch mode
@@ -83,39 +83,36 @@ module Ops =
     let [<Literal>] test = "test"
     /// Do post test cleanup
     let [<Literal>] postTest = "post-test"
-    /// Sets git for local commits using github bot client
-    let [<Literal>] gitPrelude = "git-prelude"
     /// Restores tools in repo
     let [<Literal>] restore = "restore"
     /// Formats files with fantomas
     let [<Literal>] format = "format"
     /// Cron job for use by CI
     let [<Literal>] cron = "cron"
-    let [<Literal>] changelogGen = "changelog-gen"
     let [<Literal>] loadCache = "load-cache"
-    let [<Literal>] testGitNet = "test-gitnet"
+    let [<Literal>] gitnet = "gitnet"
+    //%ExampleArgsDef%START%
     module Args =
         let [<Literal>] help = "--help"
         let [<Literal>] detailed = "--detailed"
         let [<Literal>] quick = "--quick"
-        let [<Literal>] dry = "--dry-run"
-        let [<Literal>] commit = "--commit"
+        let [<Literal>] dry = "--dry-run" //%ExampleArgsDef%END%
         let [<Literal>] release = "--release"
         let [<Literal>] npmCi = "--npm-ci"
         let [<Literal>] skipTest = "--skip-test"
-        let [<Literal>] ciRunner = "--ci-runner"
         let [<Literal>] nugetApi = "--nuget-key"
         let [<Literal>] ghKey = "--gh-key"
         let [<Literal>] target = "--target"
-        let [<Literal>] debug = "--debug"
+        let [<Literal>] open' = "--open"
+        let [<Literal>] watch = "--watch"
+        let [<Literal>] debug = "--debug" //%ExampleCommandsDef%START%
 module Commands =
     let [<Literal>] docs = "docs"
     let [<Literal>] test = "test"
     let [<Literal>] generateApiDocs = "generate-api-docs"
-    let [<Literal>] generate = "generate"
+    let [<Literal>] generate = "generate" //%ExampleCommandsDef%END%
     let [<Literal>] pack = "pack"
     let [<Literal>] cron = "cron"
-    let [<Literal>] publish = "publish"
     let [<Literal>] run = "run"
         
 
@@ -124,7 +121,7 @@ let githubUsername = "GitHub Action"
 
 [<Literal>]
 let githubEmail = "41898282+github-actions[bot]@users.noreply.github.com"
-
+//%ArgsType%START%
 type Args =
     static let mutable args = None
     static let hasFlag value = args |> Option.exists (DocoptResult.hasFlag value)
@@ -135,17 +132,18 @@ type Args =
     
     static member detailed = hasFlag Ops.Args.detailed
     static member quick = hasFlag Ops.Args.quick
-    static member dryRun = hasFlag Ops.Args.dry
+    static member dryRun = hasFlag Ops.Args.dry //%ArgsType%END%
     static member help = hasFlag Ops.Args.help
-    static member commit = hasFlag Ops.Args.commit
     static member release = getFlag Ops.Args.release
     static member npmCi = hasFlag Ops.Args.npmCi
     static member skipTest = hasFlag Ops.Args.skipTest
-    static member ciRunner = hasFlag Ops.Args.ciRunner
     static member apiKey = getFlag Ops.Args.nugetApi
     static member target = getFlag Ops.Args.target
     static member gitClientToken = getFlag Ops.Args.ghKey
     static member debug = hasFlag Ops.Args.debug
+    static member open' = hasFlag Ops.Args.open'
+    static member watch = hasFlag Ops.Args.watch
+//%CliType%START%
 and Cli =
     static member spec =
         $"""
@@ -156,14 +154,16 @@ Usage:
     Build.exe {Commands.pack} [options]
     Build.exe {Commands.cron} [options]
     Build.exe {Commands.run} [run] [options]
-    Build.exe {Commands.publish} [publish] [options]
+    Build.exe {Commands.test} [test] [options]
+
+Test Options [test]:
+    --open                  Will run the test application and open the app instead of
+                            running the headless test suite.
+    --watch                 Will run the test application and open the app in watch mode
+                            instead of running the headless test suite.
 
 Run Options [run]:
     --target <NAME>         The target to run
-
-Publish Targets [publish]:
-    --forge                 Pack and publish the Fable.Electron.Forge package
-    --remoting              Pack and publish the Fable.Electron.Remoting package
 
 Options [options]:
     -h, --help              Show this help message.
@@ -173,20 +173,14 @@ Options [options]:
     --dry-run               Collect actions and print them at the end instead of pushing any changes.
     --npm-ci                `npm install` commands are run using `ci` (clean install) instead. Use this
                             if you are encountering 'module missing' errors for npm dependencies.
-    --commit                Any steps that can commit changes during the build/push sequence will do so
-                            (for use during CI)
-    --no-restore            Perform the action without restores if they would otherwise call for it.
-    --changelog-gen         Overwrites the changelog if there have been any version changes for Fable.Electron.
     --release <RELEASE>     Perform the actions for the specific release tag.
-    --api-docs              Generate the API-Docs
-    --ci-runner             Indicate environment is CI runner - this will setup gitbot etc
     --skip-test             Skip tests
     --format                Run fantomas
     --nuget-key <API-KEY>   The key used in authentication to push packages to NuGet.
     --gh-key <PAT>          Personal access token for GitHub to use instead of the CI runner.
     --debug                 Shows the dependency list for the command and args
 """
-    static member parser = Docopt(Cli.spec)
+    static member parser = Docopt(Cli.spec) //%CliType%END%
 open Fake.IO.Globbing.Operators
 
 let sourceFiles =

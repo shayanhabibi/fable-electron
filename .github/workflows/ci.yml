@@ -2,9 +2,28 @@ name: CI
 on:
   workflow_call:
   workflow_dispatch:
-  push: 
     branches:
       - main
+      - develop
+  # TODO - turn on when stable
+#  push: 
+#    branches:
+#      - main
+  
+  # Avoid setting jobs on the hour.
+  # See https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule
+  schedule:
+    - cron: '23 4 * * 0'
+  
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NODE_VERSION: 24
+  NUGET_KEY: ${{ secrets.NUGET_KEY }}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -12,18 +31,22 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Ownership Workaround
+        run: git config --global --add safe.directory '*'
+        
       - name: Install Chromium
         uses: nanasess/setup-chromedriver@v2
+        
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
-        # This is critical to allow WDIO tests to function appropriately
+        
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
-        # Everything will be handled within our build script
-      - name: Run FAKE CI
-        # We can change this to any target we want
-        run: dotnet run -- test
         
-        # We can then trigger subsequent jobs
+      - name: Run FAKE CI
+        run: dotnet run -- cron --nuget-key ${{ env.NUGET_KEY }} --gh-key ${{ secrets.GITHUB_TOKEN }}

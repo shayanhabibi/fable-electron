@@ -100,11 +100,7 @@ module Laundry =
         branchName >> pushBranch
     
     let createBranch newBranchName =
-        Git.Stash.push root "[ci stash]"
-        Git.Branches.checkoutNewBranch root (branchName()) newBranchName
-        Git.Stash.pop root
-        // Git.Information.getCurrentShortSHA1 root
-        // |> Git.Branches.createBranch root branchName
+        CommandHelper.directRunGitCommandAndFail root $"checkout -b {newBranchName}"
     
     let commitFiles msg files =
         files
@@ -134,50 +130,6 @@ module Laundry =
             | { ExitCode = 0 } -> ()
             | result -> Trace.log $"Errors while formatting all files: %A{result.Messages}"
     
-module Changelog =
-    open Partas.GitNet
-    open Partas.Tools.SepochSemver
-    
-    let private file = FileInfo(Root.``RELEASE_NOTES.md``)
-    let getCurrentVersion () = getInitVersionElectron
-    let getNextVersionFromSemVerAndReleaseInfo (semver: GitNetTag voption) releaseInfo =
-        let semver =
-            match semver with
-            | ValueSome(GitNetTag.GitNetTag { SepochSemver = { SemVer = semver } })
-            | ValueSome(GitNetTag.SemVerTag { Semver = semver }) ->
-                { Sepoch = Sepoch.Scope "Electron"; SemVer = semver }
-            | _ -> { Sepoch = Sepoch.Scope "Electron"; SemVer = Semver.SemVersion(0,1,0) }
-        let tag = releaseInfo.tagName.TrimStart 'v'
-        if SemVer.isValid tag |> not then
-            failwith $"The downloaded electron-api comes from a release with an invalid semver for a tag: {tag}"
-        else
-        let releaseVersion = SemVer.parse tag
-        match releaseVersion with
-        | { Patch = releasePatch }
-            when bigint releaseVersion.Major = semver.SemVer.Major
-                && bigint releaseVersion.Minor = semver.SemVer.Minor ->
-            SepochSemver.Bump(semver, patch = if semver.SemVer.Patch >= bigint releasePatch then int semver.SemVer.Patch + 1 else int releasePatch)
-            |> Ok
-        | { Major = releaseMajor; Minor = releaseMinor }
-            when bigint releaseMajor > semver.SemVer.Major || (bigint releaseMinor > semver.SemVer.Minor && bigint releaseMajor >= semver.SemVer.Major) ->
-            {
-                Sepoch = semver.Sepoch
-                SemVer = Semver.SemVersion(releaseVersion.Major, releaseVersion.Minor, releaseVersion.Patch)
-            } |> Ok
-        | _ ->
-            $"Unexpected version collision where the current version is \
-                higher than the generated version: \n \
-                Current: {semver}\n Generated: {releaseVersion}"
-            |> Error
-    let tryGetNextSemVer =
-        getInitVersionElectron
-        |> getNextVersionFromSemVerAndReleaseInfo
-    let getNextSemVer =
-        tryGetNextSemVer
-        >> function
-            | Ok value -> value
-            | Error e -> failwith e
-        
 module Electron =
     let private apiFile = VirtualRoot.temp.``electron-api.json``
     let listReleases simple =
@@ -286,67 +238,3 @@ module Project =
                     )
             | None ->
                 failwith "Require NuGet Key to be passed via --nuget-api-key <APIKEY> or via env var NUGET_KEY"
-    
-module rec Cron =
-    [<RequireQualifiedAccess>]
-    type ReleaseType =
-        | Patch
-        | Major
-        | Minor
-        | None
-    // Rather than make dependencies, we'll just have cron run its own things as required
-    let run () =
-        // First do our laundry
-        [|
-            if not Args.quick then
-                Laundry.clean
-                Laundry.fableClean
-        |] |> Array.Parallel.iter (fun func -> func ())
-        let releases = Electron.getReleases()
-        let ctx = {|
-                // Get the currently cached electron version we're handling
-                CurrentElectronVersion = Electron.tryGetCachedRelease()
-                // Get the current semver of the repo
-                CurrentSemver = Changelog.getCurrentVersion()
-                // Get the latest release
-                LatestRelease = releases |> List.tryFind _.isLatest
-                // All releases
-                Releases = releases
-            |}
-        match ctx.CurrentElectronVersion, ctx.LatestRelease with
-        | Some { tagName = currentElectronVersion }, Some ({ tagName = latestVersion } as releaseInfoLatest)
-            when
-                (currentElectronVersion.TrimStart('v') |> SemVer.isValid)
-                && (latestVersion.TrimStart('v') |> SemVer.isValid) ->
-            let toSemver: string -> SemVerInfo = _.TrimStart('v') >> SemVer.parse
-            let currentElectronSemver =
-                toSemver currentElectronVersion
-            let latestElectronSemver =
-                toSemver latestVersion
-            let updateStrategy =
-                if currentElectronSemver.Major < latestElectronSemver.Major then
-                    ReleaseType.Major
-                elif
-                    currentElectronSemver.Major = latestElectronSemver.Major
-                    && currentElectronSemver.Minor < latestElectronSemver.Minor
-                then
-                    ReleaseType.Minor
-                elif 
-                    currentElectronSemver.Major = latestElectronSemver.Major
-                    && currentElectronSemver.Minor = latestElectronSemver.Minor
-                    && currentElectronSemver.Patch < latestElectronSemver.Patch
-                then ReleaseType.Patch
-                else ReleaseType.None
-            match updateStrategy with
-            | ReleaseType.Major -> // make a pull
-                ()
-            | ReleaseType.Minor | ReleaseType.Patch -> // just merge if tests pass
-                Electron.downloadRelease releaseInfoLatest
-                |> Electron.generate
-                |> function
-                    | Error _ -> failwith "Download release was not found"
-                    | _ -> ()
-            | ReleaseType.None ->
-                Trace.log $"No release will be made for Electron - current \
-                            cached version {currentElectronSemver.AsString} \
-                            is not less than the latest version {latestElectronSemver.AsString}"

@@ -10,6 +10,8 @@ module TargetOperatorExtensions =
     let (<==?) (x: string) (y: string list): string =
         y |> List.iter (fun y -> y ?=> x |> ignore) 
         x
+    let (===>) (x: string) (y: string list) =
+        y |> List.iter (fun y -> x ==> y |> ignore)
     /// All dependencies in y depend on x as a soft dependency
     /// Returns x
     let (?==>) (x: string) (y: string list): string =

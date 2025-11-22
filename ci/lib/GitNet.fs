@@ -5,8 +5,9 @@ open System.IO
 
 let private gitnetConfig = {
     GitNetConfig.initFSharp with
-        ProjectType = ProjectType.FSharp <| Some {
-            ProjectFSharpConfig.init with
+        //%IgnoreProjects%START%
+        Projects = {
+            ProjectConfig.init with
                 IgnoredProjects = [
                     Projects.Build
                     Projects.Generator
@@ -14,11 +15,12 @@ let private gitnetConfig = {
                     Projects.Docs
                     Projects.Folders.Tests.``Tests.Common``.``Tests.Common.fsproj``
                 ] |> List.map Path.GetFileNameWithoutExtension
-        }
+        } //%IgnoreProjects%END%
         AssemblyFiles = AssemblyFileManagement.None
         WriteVersionToProjects = true
         Bump = {
             BumpConfig.init with
+                DefaultBumpStrategy = ForceBumpStrategy.All
                 Mapping = {
                     CommitBumpTypeMapping.init with
                         Major = [
@@ -40,7 +42,7 @@ let private gitnetConfig = {
         }
         Output = {
             OutputConfig.init with
-                AllowUnconventional = true
+                AllowUnconventional = false
                 DefaultUnmatchedGroup = CommitGroup.Defaults.other
                 Ignore = [
                     IgnoreCommit.FooterKeyValue("changelog", "true")
@@ -48,7 +50,6 @@ let private gitnetConfig = {
                     IgnoreCommit.SkipCi
                 ]
                 AllowUnmatched = true
-                Formatting = MacroGroupType.Scoped
                 GroupMatcher = [
                     GroupMatcher(CommitGroup.Defaults.breaking, [ BumpMatcher.Type "breaking" ])
                     GroupMatcher(CommitGroup.Defaults.changed, [
@@ -85,7 +86,7 @@ let private gitnetConfig = {
 }
 
 let runtime = new GitNetRuntime(gitnetConfig)
-let private initialCompute = runtime.DryRun()
+let initialCompute = runtime.DryRun()
 let private getInitialVersion scope =
     match initialCompute.Versions.TryGetValue(scope) with
     | true, semver ->
@@ -103,3 +104,4 @@ let getInitBumpForge = getInitialBump "Forge"
 let getInitBumpElectron = getInitialBump "Electron"
 let getInitBumpRemoting = getInitialBump "Remoting"
 
+let createRuntime () = new GitNetRuntime(gitnetConfig)
