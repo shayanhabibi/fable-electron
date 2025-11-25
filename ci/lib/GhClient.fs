@@ -94,21 +94,20 @@ type PrCreateArgs = {
         Repo = { Owner = ""; Name = "" }
     }
     member this.ToArgs =
-        let normalize: ValueOption<string> -> string = _.Value >> sprintf "\"%s\""
         [
             "pr"; "create"
             if this.Assignee.IsSome then
                 "--assignee"
-                normalize this.Assignee
+                this.Assignee.Value
             if this.Base.IsSome then
                 "--base"
-                normalize this.Base
+                this.Base.Value
             if this.Body.IsSome then
                 "--body"
-                normalize this.Body
+                this.Body.Value
             if this.BodyFile.IsSome then
                 "--body-file"
-                normalize this.BodyFile
+                this.BodyFile.Value
             if this.Draft then "--draft"
             if this.DryRun then "--dry-run"
             if this.Fill then "--fill"
@@ -116,41 +115,39 @@ type PrCreateArgs = {
             if this.FillVerbose then "--fill-verbose"
             if this.Head.IsSome then
                 "--head"
-                normalize this.Head
+                this.Head.Value
             if this.Label.IsEmpty |> not then
                 yield!
                     this.Label
                     |> List.collect(fun l -> [
                         "--label"
-                        normalize <| ValueSome l
+                        l
                     ])
             if this.Milestone.IsSome then
                 "--milestone"
-                normalize this.Milestone
+                this.Milestone.Value
             if this.NoMaintainerEdit then
                 "--no-maintainer-edit"
             if this.Project.IsSome then
                 "--project"
-                normalize this.Project
+                this.Project.Value
             if this.Recover.IsSome then
                 "--recover"
-                normalize this.Recover
+                this.Recover.Value
             if this.Reviewer.IsSome then
                 "--reviewer"
-                normalize this.Reviewer
+                this.Reviewer.Value
             if this.Template.IsSome then
                 "--template"
-                normalize this.Template
+                this.Template.Value
             if this.Title.IsSome then
                 "--title"
-                normalize this.Title
+                this.Title.Value
             match this.Repo with
             | { Owner = ""; Name = "" } -> ()
             | { Owner = owner; Name = name } ->
                 "--repo"
                 $"{owner}/{name}"
-                |> ValueSome
-                |> normalize
         ]
 
 [<RequireQualifiedAccess>]

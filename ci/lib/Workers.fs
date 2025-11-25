@@ -107,6 +107,7 @@ module Laundry =
         |> List.iter (Git.Staging.stageFile root >> ignore)
         Git.Commit.exec root msg
     let private createNewPull targetBranch (title: string) (body: string)  =
+        Git.CommandHelper.
         let current = Information.getBranchName root
         Gh.createPr (fun p -> {
             p with
