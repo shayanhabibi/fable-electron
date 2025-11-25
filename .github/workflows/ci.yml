@@ -42,17 +42,17 @@ jobs:
       - name: Ownership Workaround
         run: git config --global --add safe.directory '*'
         
-      - name: Install Chromium
-        uses: nanasess/setup-chromedriver@v2
-      
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-#          cache-dependency-path: ./tests/Fable.Electron.Remoting.Tests/package-lock.json
-#          cache: npm
+        #          cache-dependency-path: ./tests/Fable.Electron.Remoting.Tests/package-lock.json
+        #          cache: npm
+        
+      - name: Install Chromium
+        uses: nanasess/setup-chromedriver@v2
         
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         
       - name: Run FAKE CI
-        run: dotnet run -- cron --nuget-key ${{ env.NUGET_KEY }} --gh-key ${{ secrets.GITHUB_TOKEN }}
+        run: dotnet run -- cron --nuget-key ${{ env.NUGET_KEY }} --gh-key ${{ secrets.GITHUB_TOKEN }} --npm-ci

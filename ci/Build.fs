@@ -440,11 +440,29 @@ Package Requires Pull: {packageRequiresPull}
                 + "Electron " + Status.getRelease().tagName
             let body =
                 if para.Context.HasError then
-                    "The generation for this build failed and requires \
-                    some changes to allow tests to pass.
- \
-                    Once those changes have been made, and tests pass, you can \
-                    merge this pull."
+                    let rec addDetails (errors: (exn * Target) list ): string list =
+                        match errors with
+                        | [] -> []
+                        | (e, target) :: rest ->
+                            [
+                                $"Error during {target.Name}:"
+                                ""
+                                "<details>"
+                                "<summary>Error</summary>"
+                                ""
+                                "```"
+                                $"{e}"
+                                "```"
+                                "</details>"
+                                ""
+                            ] @ addDetails rest
+                            
+                    addDetails para.Context.ErrorTargets
+                    |> String.concat "\n"
+                    |> sprintf "During the build process, I came across some errors. \
+                                 \
+                                Once these are corrected, please consider merging this to `develop` \
+                                %s"
                 else
                     "Once you are happy to proceed and tests are passing, you \
                     can merge this pull to 'develop' and pull to 'main' whenever \
