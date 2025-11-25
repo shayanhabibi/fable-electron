@@ -36,17 +36,15 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       
       - name: Ownership Workaround
         run: git config --global --add safe.directory '*'
         
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-        #          cache-dependency-path: ./tests/Fable.Electron.Remoting.Tests/package-lock.json
-        #          cache: npm
+          cache-dependency-path: ./tests/Fable.Electron.Remoting.Tests/package-lock.json
+          cache: npm
         
       - name: Install Chromium
         uses: nanasess/setup-chromedriver@v2
