@@ -459,9 +459,11 @@ Package Requires Pull: {packageRequiresPull}
                             
                     addDetails para.Context.ErrorTargets
                     |> String.concat "\n"
-                    |> sprintf "During the build process, \
-                                I came across some errors.\n\nOnce these are \
-                                corrected, please consider merging this to `develop`\n\n%s"
+                    |> sprintf """During the build process, I came across some errors.
+
+Once these are corrected, please consider merging this to `develop`
+
+%s"""
                 else
                     "Once you are happy to proceed and tests are passing, you \
                     can merge this pull to 'develop' and pull to 'main' whenever \
