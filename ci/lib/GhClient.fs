@@ -51,6 +51,108 @@ type DownloadArgs =
               SkipExisting = true
               Output = None } }
 
+type PrCreateArgs = {
+    Assignee: string voption
+    Base: string voption
+    Body: string voption
+    BodyFile: string voption
+    Draft: bool
+    DryRun: bool
+    Fill: bool
+    FillFirst: bool
+    FillVerbose: bool
+    Head: string voption
+    Label: string list
+    Milestone: string voption
+    NoMaintainerEdit: bool
+    Project: string voption
+    Recover: string voption
+    Reviewer: string voption
+    Template: string voption
+    Title: string voption
+    Repo: Repository
+} with
+    static member Init = {
+        Assignee = ValueNone
+        Base = ValueNone
+        Body = ValueNone
+        BodyFile = ValueNone
+        Draft = false
+        DryRun = false
+        Fill = false
+        FillFirst = false
+        FillVerbose = false
+        Head = ValueNone
+        Label = []
+        Milestone = ValueNone
+        NoMaintainerEdit = false
+        Project = ValueNone
+        Recover = ValueNone
+        Reviewer = ValueNone
+        Template = ValueNone
+        Title = ValueNone
+        Repo = { Owner = ""; Name = "" }
+    }
+    member this.ToArgs =
+        let normalize: ValueOption<string> -> string = _.Value >> sprintf "\"%s\""
+        [
+            "pr"; "create"
+            if this.Assignee.IsSome then
+                "--assignee"
+                normalize this.Assignee
+            if this.Base.IsSome then
+                "--base"
+                normalize this.Base
+            if this.Body.IsSome then
+                "--body"
+                normalize this.Body
+            if this.BodyFile.IsSome then
+                "--body-file"
+                normalize this.BodyFile
+            if this.Draft then "--draft"
+            if this.DryRun then "--dry-run"
+            if this.Fill then "--fill"
+            if this.FillFirst then "--fill-first"
+            if this.FillVerbose then "--fill-verbose"
+            if this.Head.IsSome then
+                "--head"
+                normalize this.Head
+            if this.Label.IsEmpty |> not then
+                yield!
+                    this.Label
+                    |> List.collect(fun l -> [
+                        "--label"
+                        normalize <| ValueSome l
+                    ])
+            if this.Milestone.IsSome then
+                "--milestone"
+                normalize this.Milestone
+            if this.NoMaintainerEdit then
+                "--no-maintainer-edit"
+            if this.Project.IsSome then
+                "--project"
+                normalize this.Project
+            if this.Recover.IsSome then
+                "--recover"
+                normalize this.Recover
+            if this.Reviewer.IsSome then
+                "--reviewer"
+                normalize this.Reviewer
+            if this.Template.IsSome then
+                "--template"
+                normalize this.Template
+            if this.Title.IsSome then
+                "--title"
+                normalize this.Title
+            match this.Repo with
+            | { Owner = ""; Name = "" } -> ()
+            | { Owner = owner; Name = name } ->
+                "--repo"
+                $"{owner}/{name}"
+                |> ValueSome
+                |> normalize
+        ]
+
 [<RequireQualifiedAccess>]
 module Gh =
     open System.Text.Json
@@ -137,3 +239,6 @@ module Gh =
                     else
                         failwith result.Result.Error
                 }
+    let createPr (args: PrCreateArgs -> PrCreateArgs) workingDir =
+        runRawCommand (args PrCreateArgs.Init).ToArgs workingDir
+            

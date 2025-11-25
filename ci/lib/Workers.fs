@@ -107,17 +107,20 @@ module Laundry =
         |> List.iter (Git.Staging.stageFile root >> ignore)
         Git.Commit.exec root msg
     let private createNewPull targetBranch (title: string) (body: string)  =
-        let sha = Information.getCurrentSHA1 root
-        NewPullRequest(title, sha, targetBranch, MaintainerCanModify = true, Body = body)
+        let current = Information.getBranchName root
+        Gh.createPr (fun p -> {
+            p with
+                Base = ValueSome targetBranch
+                Body = ValueSome body
+                Title = ValueSome title
+                Head = ValueSome current
+        }) root
+        |> ignore
     let private createPullForDevel = createNewPull "develop"
     let private createPullForMain = createNewPull "main"
     
-    let sendPullForDevel title = createPullForDevel title >> fun pull ->
-        withGithubClient (GitHub.createPullRequest "shayanhabibi" "fable-electron" pull)
-        |> ignore
-    let sendPullForMain title = createPullForMain title >> fun pull ->
-        withGithubClient (GitHub.createPullRequest "shayanhabibi" "fable-electron" pull)
-        |> ignore
+    let sendPullForDevel = createPullForDevel
+    let sendPullForMain = createPullForMain
     
     let tagBranch tag = Branches.tag root tag
         
