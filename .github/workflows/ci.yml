@@ -48,8 +48,8 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache-dependency-path: ./tests/Fable.Electron.Remoting.Tests/package-lock.json
-          cache: npm
+#          cache-dependency-path: ./tests/Fable.Electron.Remoting.Tests/package-lock.json
+#          cache: npm
         
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
