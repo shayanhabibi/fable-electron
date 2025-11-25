@@ -21,7 +21,7 @@ module Npm =
     /// Clean install the npm package.json in the given dir
     let cleanInstall = setDir >> Npm.cleanInstall 
     /// Install the npm package.json in the given dir
-    let install = setDir >> Npm.cleanInstall
+    let install = setDir >> Npm.install
     /// Run the script 'start' for the npm package.json in the given dir
     let start = setDir >> Npm.run "start" 
     let test = setDir >> Npm.runTest "test" 
