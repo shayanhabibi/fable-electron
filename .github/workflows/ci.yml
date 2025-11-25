@@ -26,6 +26,10 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   scheduled:
     runs-on: ubuntu-latest
