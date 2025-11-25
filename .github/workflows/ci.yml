@@ -20,6 +20,7 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   NODE_VERSION: 24
   NUGET_KEY: ${{ secrets.NUGET_KEY }}
+  GH_TOKEN: ${{ github.token }}
 
 concurrency:
   group: ${{ github.workflow }}
