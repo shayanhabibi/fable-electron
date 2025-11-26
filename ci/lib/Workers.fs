@@ -114,7 +114,7 @@ module Laundry =
         Git.Commit.exec root msg
 
     [<CLIMutable>]
-    type private PullRequestInfo =
+    type PullRequestInfo =
         { reviewers: string array
           labels: string array
           projects: string array
@@ -129,7 +129,6 @@ module Laundry =
                 |> JsonSerializer.Deserialize<PullRequestInfo>
             with e ->
                 Trace.traceError e.Message
-
                 { reviewers = [||]
                   labels = [||]
                   projects = [||]

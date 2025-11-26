@@ -467,9 +467,15 @@ Once these are corrected, please consider merging this to `develop`
 
 %s"""
                 else
-                    "Once you are happy to proceed and tests are passing, you \
-                    can merge this pull to 'develop' and pull to 'main' whenever \
-                    you want to publish the packages."
+                    let release = Status.getRelease()
+                    $"""Bindings for electron {release.tagName} were generated successfully and passed tests.
+
+This electron release was created on {release.createdAt}.
+
+This pull must be merged to `main` for publishing to occur.
+
+It is recommended to merge to `develop` for major electron versions first.
+"""
 
             if Args.dryRun then
                 Trace.log $"[ACTION] Send pull to devel:\n{title}\n\n{body}"
