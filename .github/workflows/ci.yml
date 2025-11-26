@@ -1,14 +1,10 @@
-name: CI
+name: Scheduled Binding Generator
 on:
   workflow_call:
   workflow_dispatch:
     branches:
       - main
       - develop
-  # TODO - turn on when stable
-#  push: 
-#    branches:
-#      - main
   
   # Avoid setting jobs on the hour.
   # See https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule
@@ -19,15 +15,18 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   NODE_VERSION: 24.x
-  NUGET_KEY: ${{ secrets.NUGET_KEY }}
+  NUGET_KEY: ${{ secrets.FABLE_ELECTRON_NUGET }}
+  # Must explicitly set GH_TOKEN for gh cli in workflows
   GH_TOKEN: ${{ github.token }}
 
 concurrency:
+  # If we call a workflow while another is scheduled; cancel
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
 permissions:
   contents: write
+  # permission to write pull requests
   pull-requests: write
 
 jobs:
@@ -37,6 +36,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
+          # Require fetch-depth 0 for gitnet/changelog generation
           fetch-depth: 0
       
       - name: Ownership Workaround

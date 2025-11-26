@@ -30,13 +30,13 @@ module Status =
     let mutable private _cache = None
     let setCache (releaseInfo: ReleaseInfo) = _cache <- Some releaseInfo
     let hasCache () = _cache.IsSome
-    let tryGetCache() = _cache
+    let tryGetCache () = _cache
     let getCache = tryGetCache >> Option.get
     //highlight-next-line
     let mutable private _release = None
     let setRelease (release: ReleaseInfo) = _release <- Some release
     let hasRelease () = _release.IsSome
-    let tryGetRelease() = _release
+    let tryGetRelease () = _release
     let getRelease = tryGetRelease >> Option.get
     let getSemver = getRelease >> _.tagName.TrimStart('v') >> SemVer.parse //%StatusModule%END%
 
@@ -45,53 +45,65 @@ Target.create Ops.clean (ignore >> Laundry.clean)
 Target.create Ops.fableClean (ignore >> Laundry.fableClean)
 Target.create Ops.listReleases (fun _ -> Electron.listReleases true)
 Target.create Ops.listDetailedReleases (fun _ -> Electron.listReleases false)
-Target.create Ops.downloadApi <| fun _ ->
+
+Target.create Ops.downloadApi
+<| fun _ ->
     match Args.release with
     | Some value ->
         Electron.tryGetReleaseFromString value
-        |> Option.orElseWith(fun () -> failwith $"Could not download a release matching the input '{value}'")
+        |> Option.orElseWith (fun () -> failwith $"Could not download a release matching the input '{value}'")
         |> Option.iter (fun releaseInfo ->
             Status.setRelease releaseInfo
             Electron.downloadRelease releaseInfo)
     | None -> failwithf $"Target %s{Ops.downloadApi} requires the argument '--release <RELEASE>' to be set"
-Target.create Ops.downloadInput <| fun _ ->
+
+Target.create Ops.downloadInput
+<| fun _ ->
     let getUserInput () =
-        let isQuit: string -> bool = _.ToLowerInvariant() >> function
-            | "q" | "quit" -> true
-            | _ -> false
+        let isQuit: string -> bool =
+            _.ToLowerInvariant()
+            >> function
+                | "q"
+                | "quit" -> true
+                | _ -> false
+
         match UserInput.getUserInput "Choose a release or (q)uit:\n" with
-        | text when isQuit text ->
-            failwith "User quit"
+        | text when isQuit text -> failwith "User quit"
         | text -> text
+
     let rec run value =
         match Electron.tryGetReleaseFromString value with
         | None ->
             Electron.listReleases true
-            getUserInput ()
-            |> run
+            getUserInput () |> run
         | Some value ->
             Status.setRelease value
             Electron.downloadRelease value
+
     Electron.listReleases true
-    getUserInput ()
-    |> run
-Target.create Ops.downloadLatest <| fun _ ->
+    getUserInput () |> run
+
+Target.create Ops.downloadLatest
+<| fun _ ->
     Electron.tryGetRelease _.isLatest
     |> function
         | Some release ->
             Status.setRelease release
             Electron.downloadRelease release
-        | None ->
-            failwith "Was not able to identify the latest release using the 'gh' cli."
+        | None -> failwith "Was not able to identify the latest release using the 'gh' cli."
+
 Target.create Ops.postDownload (ignore >> Laundry.clean)
-Target.create Ops.generate <| fun _ ->
-    Electron.generate()
+
+Target.create Ops.generate
+<| fun _ ->
+    Electron.generate ()
     |> Result.mapError (fun _ ->
-        failwith "Attempted to generate from an electron-api.json, but none were downloaded.\n \
+        failwith
+            "Attempted to generate from an electron-api.json, but none were downloaded.\n \
                   Either run target 'generate-release' or place the electron-api.json in the \
-                  '/temp' folder at the root of the repository directory."
-        )
+                  '/temp' folder at the root of the repository directory.")
     |> ignore
+
 Target.create Ops.setupDocs <| fun _ -> Docs.setup Args.npmCi
 Target.create Ops.docs (ignore >> Docs.dev)
 Target.create Ops.build (fun _ -> Project.build Project.Targets.All)
@@ -108,7 +120,8 @@ Target.create Ops.format (ignore >> Laundry.format)
 // sign post
 Target.create Ops.cron ignore
 
-Target.create Ops.loadCache <| fun _ ->
+Target.create Ops.loadCache
+<| fun _ ->
     if File.exists Files.Cache then
         File.readAsString Files.Cache
         |> JsonSerializer.Deserialize<ReleaseInfo>
@@ -116,102 +129,106 @@ Target.create Ops.loadCache <| fun _ ->
 
 open Partas.Tools.SepochSemver
 //%gitnet1%START%
-Target.create Ops.gitnet <| fun para ->
+Target.create Ops.gitnet
+<| fun para ->
     let projects = runtime.CrackRepo
+
     let getProjectOrFail leaf =
-        try Seq.find _.ProjectFileName.EndsWith(leaf + ".fsproj") projects with e ->
+        try
+            Seq.find _.ProjectFileName.EndsWith(leaf + ".fsproj") projects
+        with e ->
             Trace.traceError $"A required project was not found. Could not find a project file ending with '{leaf}'"
             raise e
-    let project = {|
-        electron = getProjectOrFail "Electron"
-        forge = getProjectOrFail "Forge"
-        remoting = getProjectOrFail "Remoting"
-    |} //%gitnet1%END% //%gitnet2%START%
+
+    let project =
+        {| electron = getProjectOrFail "Electron"
+           forge = getProjectOrFail "Forge"
+           remoting = getProjectOrFail "Remoting" |} //%gitnet1%END% //%gitnet2%START%
     // ========== Current version/status
     let currentElectronVersion =
         let mutable maybeVersion: string option = None
+
         project.electron
         //highlight-next-line
-        |> CrackedProject.withFsProj(
+        |> CrackedProject.withFsProj (
             CrackedProject.Document.withProperty
                 "ElectronVersion"
-                (_.Value >> Option.ofObj >> function
-                    | Some value -> maybeVersion <- Some value
-                    | None -> ())
+                (_.Value
+                 >> Option.ofObj
+                 >> function
+                     | Some value -> maybeVersion <- Some value
+                     | None -> ())
             >> Error
-            )
-        |> fun _ ->
-            maybeVersion
-            |> Option.bind tryParseSepochSemver
-            |> Option.map _.SemVer
-        |> Option.orElseWith( fun () ->
-                Status.tryGetCache()
-                |> Option.bind (_.tagName.TrimStart('v') >> tryParseSepochSemver >> Option.map _.SemVer)
-            )
-        |> Option.defaultValue (Semver.SemVersion(0,1,0))
+        )
+        |> fun _ -> maybeVersion |> Option.bind tryParseSepochSemver |> Option.map _.SemVer
+        |> Option.orElseWith (fun () ->
+            Status.tryGetCache ()
+            |> Option.bind (_.tagName.TrimStart('v') >> tryParseSepochSemver >> Option.map _.SemVer))
+        |> Option.defaultValue (Semver.SemVersion(0, 1, 0))
+
     let downloadedVersion =
-        Status.tryGetRelease()
+        Status.tryGetRelease ()
         |> Option.bind (_.tagName.TrimStart('v') >> tryParseSepochSemver)
         |> Option.map _.SemVer
         //highlight-next-line
         |> Option.get
+
     let currentPackageVersion =
         //highlight-next-line
         getInitVersionElectron
-        |> ValueOption.bind(function
+        |> ValueOption.bind (function
             | GitNetTag.SepochTag(sepochSemver = { SemVer = semver })
             | GitNetTag.SemVerTag(semver = semver) -> ValueSome semver
             | _ -> ValueNone)
-        |> ValueOption.defaultValue (Semver.SemVersion(0,1,0)) //%gitnet2%END%
+        |> ValueOption.defaultValue (Semver.SemVersion(0, 1, 0)) //%gitnet2%END%
     //%gitnet3%START%
     // ============ Deltas
-    let deltaVersion = {|
-            major = int(downloadedVersion.Major - currentElectronVersion.Major)
-            minor = int(downloadedVersion.Minor - currentElectronVersion.Minor)
-            patch = int(downloadedVersion.Patch - currentElectronVersion.Patch)
-        |}
+    let deltaVersion =
+        {| major = int (downloadedVersion.Major - currentElectronVersion.Major)
+           minor = int (downloadedVersion.Minor - currentElectronVersion.Minor)
+           patch = int (downloadedVersion.Patch - currentElectronVersion.Patch) |}
+
     let isMajorChange = deltaVersion.major > 0
     let isMinorChange = deltaVersion.minor > 0 || isMajorChange
     let isPatchChange = deltaVersion.patch > 0 || isMajorChange
     let isElectronVersionDifferent = isMajorChange || isMinorChange || isPatchChange
     //highlight-next-line
-    let isLocalBindingDirty = Electron.isDirty()
+    let isLocalBindingDirty = Electron.isDirty ()
+
     let cachedVersion =
-        Status.tryGetCache()
+        Status.tryGetCache ()
         |> Option.bind (_.tagName.TrimStart('v') >> tryParseSepochSemver >> Option.map _.SemVer)
-        |> Option.defaultValue (Semver.SemVersion(0,1,0))
+        |> Option.defaultValue (Semver.SemVersion(0, 1, 0))
+
     let isProbablyPulled =
         isMajorChange && (currentElectronVersion.ComparePrecedenceTo cachedVersion < 0)
     //%gitnet3%END% //%gitnet4%START%
     // ============= Next
     let electronScope = "Electron"
-    let makeElectronSepochSemver = fun semver -> { SemVer = semver; Sepoch = Sepoch.Scope electronScope }
+
+    let makeElectronSepochSemver =
+        fun semver ->
+            { SemVer = semver
+              Sepoch = Sepoch.Scope electronScope }
+
     let nextVersion =
         match isElectronVersionDifferent, isLocalBindingDirty, isMajorChange || isMinorChange with
-        | false, false, _ ->
-            currentPackageVersion
-            |> makeElectronSepochSemver
+        | false, false, _ -> currentPackageVersion |> makeElectronSepochSemver
         | true, _, false
-        | false, true, _ ->
-            currentPackageVersion
-            |> makeElectronSepochSemver
-            |> SepochSemver.bumpPatch
-        | true, _, _ ->
-            downloadedVersion
-            |> makeElectronSepochSemver
-    let electronPackageUpdated =
-        isElectronVersionDifferent
-        || isLocalBindingDirty
+        | false, true, _ -> currentPackageVersion |> makeElectronSepochSemver |> SepochSemver.bumpPatch
+        | true, _, _ -> downloadedVersion |> makeElectronSepochSemver
+
+    let electronPackageUpdated = isElectronVersionDifferent || isLocalBindingDirty
+
     let anyPackageUpdated =
-        electronPackageUpdated
-        || getInitBumpRemoting.IsSome
-        || getInitBumpForge.IsSome
+        electronPackageUpdated || getInitBumpRemoting.IsSome || getInitBumpForge.IsSome
+
     let packageRequiresPull =
-        (isMajorChange && not isProbablyPulled)
-        || para.Context.HasError
+        (isMajorChange && not isProbablyPulled) || para.Context.HasError
     //%gitnet4%END%
     // ====== Debug msg
-    printfn $"
+    printfn
+        $"
 Summary of current status for GitNet:
 
 Electron Cached Version: {cachedVersion.ToString()}
@@ -271,108 +288,100 @@ Package Requires Pull: {packageRequiresPull}
     | true, false, true ->
         // Electron package didnt update, but our other dependent packages failed
         // which means we will not push this update at all.
-        para.Context.ErrorTargets
-        |> Trace.traceErrorfn "%A"
+        para.Context.ErrorTargets |> Trace.traceErrorfn "%A"
     | _, true, requiresPull ->
         // The message for the commit should still abide by ConventionalCommits.
         let commitMessage =
             [
-                // Major changes require ! to indicate breaking change
-                if isMajorChange then
-                    "feat!: Electron binding update to match " + Status.getRelease().tagName
-                // Minor change
-                elif isMinorChange then
-                    "feat: Electron binding update to match " + Status.getRelease().tagName
-                // Patch
-                else
-                    "fix: Electron binding update to match " + Status.getRelease().tagName
-                ""
-                "This commit is automatically generated by Build project."
-                ""
-                // Footer will allow us to filter these commits
-                "generated: true"
-            ] |> String.concat "\n"
+              // Major changes require ! to indicate breaking change
+              if isMajorChange then
+                  "feat!: Electron binding update to match " + Status.getRelease().tagName
+              // Minor change
+              elif isMinorChange then
+                  "feat: Electron binding update to match " + Status.getRelease().tagName
+              // Patch
+              else
+                  "fix: Electron binding update to match " + Status.getRelease().tagName
+              ""
+              "This commit is automatically generated by Build project."
+              ""
+              // Footer will allow us to filter these commits
+              "generated: true" ]
+            |> String.concat "\n"
         // Electron package has changed. So we'll do a run through everything.
         match requiresPull, Args.dryRun with
         | true, false ->
             // If requires a pull, then we'll do everything in a different branch
-            Laundry.createBranch $"ci/electron/{Status.getRelease().tagName}"
-        | true, true ->
-            Trace.log $"[ACTION] Create branch: ci/electron/{Status.getRelease().tagName}"
+            // If the pull already exists though then we'll stop
+            Git.Branches.getRemoteBranches Root.``.``
+            |> List.exists ((=) $"ci/electron/{Status.getRelease().tagName}")
+            |> function
+                | true -> failwith "A pull already exists for this release."
+                | false -> Laundry.createBranch $"ci/electron/{Status.getRelease().tagName}"
+        | true, true -> Trace.log $"[ACTION] Create branch: ci/electron/{Status.getRelease().tagName}"
         | _, false ->
             // If we don't have to make a pull, then we'll change the versions in the project files
             // Otherwise, this change should be delegated to when we actually merge.
             // Exception for this is the cache release info. We'll use that as our guide post
             // for the merge version.
-            
+
             // If the electron version is different, we also update the property in the project file
             // to match this.
             if isElectronVersionDifferent then
                 project.electron
-                |> CrackedProject.withFsProj(
-                    CrackedProject.Document
-                        .withProperty "ElectronVersion" _.SetValue(downloadedVersion.ToString())
+                |> CrackedProject.withFsProj (
+                    CrackedProject.Document.withProperty "ElectronVersion" _.SetValue(downloadedVersion.ToString())
                     // Return Ok to overwrite the project file
                     // Return Error to prevent overwriting project file
-                    >> ignore >> Ok
-                    )
+                    >> ignore
+                    >> Ok
+                )
                 |> ignore
-            [
-                project.electron, nextVersion.SemVer
-                match getInitBumpForge with
-                | ValueSome { SemVer = version } ->
-                    project.forge, version
-                | _ -> ()
-                match getInitBumpRemoting with
-                | ValueSome { SemVer = version } ->
-                    project.remoting, version
-                | _ -> ()
-            ]
-            |> List.iter(fun (proj, version) ->
+
+            [ project.electron, nextVersion.SemVer
+              match getInitBumpForge with
+              | ValueSome { SemVer = version } -> project.forge, version
+              | _ -> ()
+              match getInitBumpRemoting with
+              | ValueSome { SemVer = version } -> project.remoting, version
+              | _ -> () ]
+            |> List.iter (fun (proj, version) ->
                 let versionString = version.ToString()
+
                 proj
-                |> CrackedProject.withFsProj(
+                |> CrackedProject.withFsProj (
                     CrackedProject.Document.withPackageVersion _.SetValue(versionString)
                     >> CrackedProject.Document.withVersion _.SetValue(versionString)
-                    >> ignore >> Ok
-                    )
-                |> ignore
+                    >> ignore
+                    >> Ok
                 )
+                |> ignore)
         | _, true ->
-            Trace.logItems "[ACTION]" [
-                downloadedVersion.ToString()
-                |> sprintf "Set Fable.Electron ElectronVersion: %s"
-                nextVersion.SemVer.ToString()
-                |> sprintf "Set Fable.Electron Version: %s"
-                
-                match getInitBumpForge with
-                | ValueSome { SemVer = version } ->
-                    version.ToString()
-                    |> sprintf "Set Fable.Electron.Forge Version: %s"
-                | _ -> ()
-                match getInitBumpRemoting with
-                | ValueSome { SemVer = version } ->
-                    version.ToString()
-                    |> sprintf "Set Fable.Electron.Remoting Version: %s"
-                | _ -> ()
-            ]
-            
+            Trace.logItems
+                "[ACTION]"
+                [ downloadedVersion.ToString() |> sprintf "Set Fable.Electron ElectronVersion: %s"
+                  nextVersion.SemVer.ToString() |> sprintf "Set Fable.Electron Version: %s"
+
+                  match getInitBumpForge with
+                  | ValueSome { SemVer = version } ->
+                      version.ToString() |> sprintf "Set Fable.Electron.Forge Version: %s"
+                  | _ -> ()
+                  match getInitBumpRemoting with
+                  | ValueSome { SemVer = version } ->
+                      version.ToString() |> sprintf "Set Fable.Electron.Remoting Version: %s"
+                  | _ -> () ]
+
         // Write the version/release info to the cache that this generation was based off
         if not Args.dryRun then
-            Status.getRelease()
-            |> Electron.writeToCache
+            Status.getRelease () |> Electron.writeToCache
         else
-            Trace.log $"[ACTION] Write to cache: {Status.getRelease()}"
-    
-        [
-            project.electron
-            project.forge
-            project.remoting
-        ] // We collect all the compiled files for each project, the project files
+            Trace.log $"[ACTION] Write to cache: {Status.getRelease ()}"
+
+        [ project.electron; project.forge; project.remoting ] // We collect all the compiled files for each project, the project files
         |> List.collect (fun proj ->
-            CrackedProject.getCompiledFilePaths proj |> List.map (Path.combine proj.ProjectDirectory)
-            |> List.append [ CrackedProject.projectFileName proj ]
-            )
+            CrackedProject.getCompiledFilePaths proj
+            |> List.map (Path.combine proj.ProjectDirectory)
+            |> List.append [ CrackedProject.projectFileName proj ])
         // We also add the cache file
         |> List.append [ Path.combine "ci" "cache.json" ]
         // We stage the files and then commit
@@ -383,30 +392,24 @@ Package Requires Pull: {packageRequiresPull}
             | files ->
                 runtime.StageFiles files
                 runtime.CommitChanges(message = commitMessage, appendCommit = false)
-        
+
         // If we don't need to make a pull, then we can commit the tags.
         // Otherwise, we'll leave that for when the pull is merged.
         if not requiresPull then
-            let tags = [
-                nextVersion
-                if getInitBumpForge.IsSome then getInitBumpForge.Value
-                if getInitBumpRemoting.IsSome then getInitBumpRemoting.Value
-            ]
+            let tags =
+                [ nextVersion
+                  if getInitBumpForge.IsSome then
+                      getInitBumpForge.Value
+                  if getInitBumpRemoting.IsSome then
+                      getInitBumpRemoting.Value ]
+
             if Args.dryRun then
-                Trace.logItems "[ACTION]" (
-                    tags
-                    |> List.map (
-                        _.ToString() >> sprintf "Git Tag with: %s"
-                        )
-                    )
+                Trace.logItems "[ACTION]" (tags |> List.map (_.ToString() >> sprintf "Git Tag with: %s"))
             else
                 runtime.CommitTags tags
+
         if Args.dryRun then
-            Trace.logItems "[ACTION]" [
-                "GENERATE RELEASE_NOTES"
-                "Stage release notes"
-                "Commit changes"
-            ]
+            Trace.logItems "[ACTION]" [ "GENERATE RELEASE_NOTES"; "Stage release notes"; "Commit changes" ]
         else
             // Once we have committed above, the markdown output will include the
             // tags/commits, and we can generate the release notes
@@ -416,50 +419,49 @@ Package Requires Pull: {packageRequiresPull}
             // the message if a commit has been made - but also overwrites the commit
             // message, we use WriteToOutputAndStage and then commit the changes
             |> runtime.WriteToOutputAndStage
+
             runtime.CommitChanges(appendCommit = false)
+
         if not requiresPull then
             // Before we do any pushing, we'll make sure the packages have no issues getting
             // pushed to nuget if we're not doing a pull
-            Target.WithContext.run 1 (
-                if Args.dryRun
-                then Ops.pack
-                else Ops.push
-                ) []
+            Target.WithContext.run 1 (if Args.dryRun then Ops.pack else Ops.push) []
             |> Target.raiseIfError
+
         if Args.dryRun then
             Trace.log "[ACTION] Push to branch"
         else
             // This will push to main or push to the created branch
-            Laundry.pushCurrentBranch()
+            Laundry.pushCurrentBranch ()
         // If we have to make a pull, we'll generate the pull using Octokit
         if requiresPull then
             let title =
-                if para.Context.HasError then
-                    "[GEN ERROR] For "
-                else ""
-                + "Electron " + Status.getRelease().tagName
+                if para.Context.HasError then "[GEN ERROR] For " else ""
+                + "Electron "
+                + Status.getRelease().tagName
+
             let body =
                 if para.Context.HasError then
-                    let rec addDetails (errors: (exn * Target) list ): string list =
+                    let rec addDetails (errors: (exn * Target) list) : string list =
                         match errors with
                         | [] -> []
                         | (e, target) :: rest ->
-                            [
-                                $"Error during {target.Name}:"
-                                ""
-                                "<details>"
-                                "<summary>Error</summary>"
-                                ""
-                                "```"
-                                $"{e}"
-                                "```"
-                                "</details>"
-                                ""
-                            ] @ addDetails rest
-                            
+                            [ $"Error during '{target.Name}':"
+                              ""
+                              "<details>"
+                              "<summary>Error</summary>"
+                              ""
+                              "```"
+                              $"{e}"
+                              "```"
+                              "</details>"
+                              "" ]
+                            @ addDetails rest
+
                     addDetails para.Context.ErrorTargets
                     |> String.concat "\n"
-                    |> sprintf """During the build process, I came across some errors.
+                    |> sprintf
+                        """During the build process, I came across some errors.
 
 Once these are corrected, please consider merging this to `develop`
 
@@ -468,6 +470,7 @@ Once these are corrected, please consider merging this to `develop`
                     "Once you are happy to proceed and tests are passing, you \
                     can merge this pull to 'develop' and pull to 'main' whenever \
                     you want to publish the packages."
+
             if Args.dryRun then
                 Trace.log $"[ACTION] Send pull to devel:\n{title}\n\n{body}"
             else // Pulls are made to Devel rather than Main
@@ -475,19 +478,17 @@ Once these are corrected, please consider merging this to `develop`
     | true, false, false when not Args.dryRun ->
         // If electron package is the same, then we can just do a normal run
         // and let everything fall into place
-        use runtime = createRuntime()
-        runtime.Run()
-        |> ignore
-        Target.WithContext.run 1 Ops.push []
-        |> Target.raiseIfError
+        use runtime = createRuntime ()
+        runtime.Run() |> ignore
+        Target.WithContext.run 1 Ops.push [] |> Target.raiseIfError
     | true, false, false ->
         Trace.log $"[ACTION] Update Forge?: {getInitBumpForge}"
         Trace.log $"[ACTION] Update Remoting?: {getInitBumpRemoting}"
         Trace.log "[ACTION] Pushing to nuget"
-    //%gitnet5%END%
+//%gitnet5%END%
 
 Target.create Ops.activateGitnet <| fun _ -> Target.activateFinal Ops.gitnet
-        
+
 open Fake.Core.TargetOperators
 // ==========================================================
 // CI entry point
@@ -499,105 +500,77 @@ let main argsv =
     // Set what operations of the CI must precede other operations
     let dependencyMapping =
         // Dependency on restore for any tool related actions
-        Ops.restore ===> [
-            Ops.clean
-            ==> Ops.fableClean
-            Ops.downloadApi
-            Ops.downloadInput
-            Ops.downloadLatest
-            Ops.listDetailedReleases
-            Ops.listReleases
-            Ops.generate
-            Ops.generateApiDocs
-            Ops.test
-            Ops.format
-        ]
-        Ops.gitnet <== [
-            Ops.loadCache
-        ]
-        Ops.gitnet <==? [
-            Ops.postDownload
-            Ops.postTest
-            Ops.test
-            Ops.fableClean
-            Ops.format
-        ] |> ignore
+        Ops.restore
+        ===> [ Ops.clean ==> Ops.fableClean
+               Ops.downloadApi
+               Ops.downloadInput
+               Ops.downloadLatest
+               Ops.listDetailedReleases
+               Ops.listReleases
+               Ops.generate
+               Ops.generateApiDocs
+               Ops.test
+               Ops.format ]
+
+        Ops.gitnet <== [ Ops.loadCache ]
+
+        Ops.gitnet
+        <==? [ Ops.postDownload; Ops.postTest; Ops.test; Ops.fableClean; Ops.format ]
+        |> ignore
+
         [
-            // define setup requirements
-            Ops.setupTest
-            =?> (Ops.test, not Args.quick)
-            ==> Ops.postTest
-            // If generate occurs, it is a soft dependency
-            // for multiple targets
-            Ops.generate ?==> [
-                Ops.test
-                Ops.format
-                Ops.generateApiDocs
-                Ops.build
-                Ops.pack
-                Ops.push
-                Ops.gitnet
-                Ops.postDownload
-            ]
-            // On the other hand, generate has plenty of soft dependencies itself
-            Ops.generate <==? [
-                Ops.downloadApi
-                Ops.downloadInput
-                Ops.downloadLatest
-            ]
-            Ops.setupDocs
-            =?> (Ops.docs, not Args.quick)
-            
-            Ops.postDownload <==? [
-                Ops.downloadApi
-                Ops.downloadInput
-                Ops.downloadLatest
-                Ops.generate
-            ]
-            Ops.build
-            ==> Ops.pack
-            ==> Ops.push
-        ]
-        //%TargetDeps%END%
+          // define setup requirements
+          Ops.setupTest =?> (Ops.test, not Args.quick) ==> Ops.postTest
+          // If generate occurs, it is a soft dependency
+          // for multiple targets
+          Ops.generate
+          ?==> [ Ops.test
+                 Ops.format
+                 Ops.generateApiDocs
+                 Ops.build
+                 Ops.pack
+                 Ops.push
+                 Ops.gitnet
+                 Ops.postDownload ]
+          // On the other hand, generate has plenty of soft dependencies itself
+          Ops.generate <==? [ Ops.downloadApi; Ops.downloadInput; Ops.downloadLatest ]
+          Ops.setupDocs =?> (Ops.docs, not Args.quick)
+
+          Ops.postDownload
+          <==? [ Ops.downloadApi; Ops.downloadInput; Ops.downloadLatest; Ops.generate ]
+          Ops.build ==> Ops.pack ==> Ops.push ]
+    //%TargetDeps%END%
     let run =
         if Args.debug then
             Target.printDependencyGraph true
         else
             Target.runOrDefaultWithArguments
+
     match argsv[0] with
-    | _ when Args.help ->
-        printfn $"%s{Cli.spec}"
-    | Commands.generateApiDocs ->
-        run Ops.generateApiDocs
-    | Commands.docs ->
-        run Ops.docs 
-    | Commands.generate ->
-        run Ops.generate 
+    | _ when Args.help -> printfn $"%s{Cli.spec}"
+    | Commands.generateApiDocs -> run Ops.generateApiDocs
+    | Commands.docs -> run Ops.docs
+    | Commands.generate -> run Ops.generate
     | Commands.run ->
         match Args.target with
         | None -> failwith "No target supplied to '--target <NAME>'"
         | Some target -> run target
     | Commands.cron ->
-        let dependencies = [
-            Ops.downloadLatest
-            ==> Ops.generate
-            ==> Ops.activateGitnet
-            ==> Ops.postDownload
-            ==> Ops.build
-            ==> Ops.pack
-            ==> Ops.test
-            ==> Ops.postTest
-            ?==> [
-                Ops.gitnet
-                Ops.cron
-            ]
-            ==> Ops.cron
-        ]
+        let dependencies =
+            [ Ops.downloadLatest
+              ==> Ops.generate
+              ==> Ops.activateGitnet
+              ==> Ops.postDownload
+              ==> Ops.build
+              ==> Ops.pack
+              ==> Ops.test
+              ==> Ops.postTest
+              ?==> [ Ops.gitnet; Ops.cron ]
+              ==> Ops.cron ]
+
         run Ops.cron
-    | Commands.pack ->
-        run Ops.pack
-    | Commands.test ->
-        run (if Args.quick then Ops.test else Ops.postTest)
-    | maybeTarget ->
-        run maybeTarget
+    | Commands.pack -> run Ops.pack
+    | Commands.test -> run (if Args.quick then Ops.test else Ops.postTest)
+    | maybeTarget -> run maybeTarget
+
     0

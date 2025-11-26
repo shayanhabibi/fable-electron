@@ -30,12 +30,16 @@ module Projects =
         type Electron = Root.src.``Fable.Electron``
         type Forge = Root.src.``Fable.Electron.Forge``
         type Tests = Root.tests
+
     let Remoting = Folders.Remoting.``Fable.Electron.Remoting.fsproj``
     let Generator = Folders.Generator.``ElectronApi.Json.Parser.fsproj``
     let Build = Root.``Build.fsproj``
     let Electron = Folders.Electron.``Fable.Electron.fsproj``
     let Forge = Folders.Forge.``Fable.Electron.Forge.fsproj``
-    let Test = Folders.Tests.``Fable.Electron.Remoting.Tests``.``Fable.Electron.Remoting.Tests.fsproj``
+
+    let Test =
+        Folders.Tests.``Fable.Electron.Remoting.Tests``.``Fable.Electron.Remoting.Tests.fsproj``
+
     let Docs = Root.docs.``Docs.fsproj``
 
 module Solutions =
@@ -47,74 +51,162 @@ module Files =
 //%PredefinedFileProvider%END% //%TargetsExample%START%
 module Ops =
     /// Clean directories from build material, and temporary files downloaded such as electron-api.json
-    let [<Literal>] clean = "clean"
+    [<Literal>]
+    let clean = "clean"
+
     /// Clean directories from fable generated files
-    let [<Literal>] fableClean = "fable-clean"
+    [<Literal>]
+    let fableClean = "fable-clean"
+
     /// List releases from electron
-    let [<Literal>] listReleases = "list-releases" //%TargetsExample%END%
+    [<Literal>]
+    let listReleases = "list-releases" //%TargetsExample%END%
+
     /// List releases from electron with details
-    let [<Literal>] listDetailedReleases = "list-detailed-releases"
+    [<Literal>]
+    let listDetailedReleases = "list-detailed-releases"
     //%DownloadTargets%START%
     /// Download a specified release
-    let [<Literal>] downloadApi = "download-api"
-    let [<Literal>] downloadLatest = "download-latest"
+    [<Literal>]
+    let downloadApi = "download-api"
+
+    [<Literal>]
+    let downloadLatest = "download-latest"
+
     /// Combines list releases and download api interactively
-    let [<Literal>] downloadInput = "download-input" //%DownloadTargets%END%
+    [<Literal>]
+    let downloadInput = "download-input" //%DownloadTargets%END%
+
     /// Post download cleanup
-    let [<Literal>] postDownload = "post-download-clean"
+    [<Literal>]
+    let postDownload = "post-download-clean"
+
     /// Generate the Fable.Electron bindings
-    let [<Literal>] generate = "generate"
-    let [<Literal>] activateGitnet = "activate-gitnet"
+    [<Literal>]
+    let generate = "generate"
+
+    [<Literal>]
+    let activateGitnet = "activate-gitnet"
+
     /// Setup docs via npm i or npm ci
-    let [<Literal>] setupDocs = "setup-docs"
+    [<Literal>]
+    let setupDocs = "setup-docs"
+
     /// Run docs in watch mode
-    let [<Literal>] docs = "docs"
+    [<Literal>]
+    let docs = "docs"
+
     /// Build projects
-    let [<Literal>] build = "build"
+    [<Literal>]
+    let build = "build"
+
     /// Pack projects
-    let [<Literal>] pack = "pack"
+    [<Literal>]
+    let pack = "pack"
+
     /// Push to nuget
-    let [<Literal>] push = "push"
+    [<Literal>]
+    let push = "push"
+
     /// Generate the API Docs (only to be run in an external repo)
-    let [<Literal>] generateApiDocs = "generate-api-docs"
+    [<Literal>]
+    let generateApiDocs = "generate-api-docs"
+
     /// Does setup for tests by downloading deps with npm i or npm ci
-    let [<Literal>] setupTest = "setup-test"
+    [<Literal>]
+    let setupTest = "setup-test"
+
     /// Run tests
-    let [<Literal>] test = "test"
+    [<Literal>]
+    let test = "test"
+
     /// Do post test cleanup
-    let [<Literal>] postTest = "post-test"
+    [<Literal>]
+    let postTest = "post-test"
+
     /// Restores tools in repo
-    let [<Literal>] restore = "restore"
+    [<Literal>]
+    let restore = "restore"
+
     /// Formats files with fantomas
-    let [<Literal>] format = "format"
+    [<Literal>]
+    let format = "format"
+
     /// Cron job for use by CI
-    let [<Literal>] cron = "cron"
-    let [<Literal>] loadCache = "load-cache"
-    let [<Literal>] gitnet = "gitnet"
+    [<Literal>]
+    let cron = "cron"
+
+    [<Literal>]
+    let loadCache = "load-cache"
+
+    [<Literal>]
+    let gitnet = "gitnet"
     //%ExampleArgsDef%START%
     module Args =
-        let [<Literal>] help = "--help"
-        let [<Literal>] detailed = "--detailed"
-        let [<Literal>] quick = "--quick"
-        let [<Literal>] dry = "--dry-run" //%ExampleArgsDef%END%
-        let [<Literal>] release = "--release"
-        let [<Literal>] npmCi = "--npm-ci"
-        let [<Literal>] skipTest = "--skip-test"
-        let [<Literal>] nugetApi = "--nuget-key"
-        let [<Literal>] ghKey = "--gh-key"
-        let [<Literal>] target = "--target"
-        let [<Literal>] open' = "--open"
-        let [<Literal>] watch = "--watch"
-        let [<Literal>] debug = "--debug" //%ExampleCommandsDef%START%
+        [<Literal>]
+        let help = "--help"
+
+        [<Literal>]
+        let detailed = "--detailed"
+
+        [<Literal>]
+        let quick = "--quick"
+
+        [<Literal>]
+        let dry = "--dry-run" //%ExampleArgsDef%END%
+
+        [<Literal>]
+        let release = "--release"
+
+        [<Literal>]
+        let npmCi = "--npm-ci"
+
+        [<Literal>]
+        let skipTest = "--skip-test"
+
+        [<Literal>]
+        let nugetApi = "--nuget-key"
+
+        [<Literal>]
+        let ghKey = "--gh-key"
+
+        [<Literal>]
+        let target = "--target"
+
+        [<Literal>]
+        let open' = "--open"
+
+        [<Literal>]
+        let watch = "--watch"
+
+        [<Literal>]
+        let debug = "--debug" //%ExampleCommandsDef%START%
+
 module Commands =
-    let [<Literal>] docs = "docs"
-    let [<Literal>] test = "test"
-    let [<Literal>] generateApiDocs = "generate-api-docs"
-    let [<Literal>] generate = "generate" //%ExampleCommandsDef%END%
-    let [<Literal>] pack = "pack"
-    let [<Literal>] cron = "cron"
-    let [<Literal>] run = "run"
-        
+    [<Literal>]
+    let docs = "docs"
+
+    [<Literal>]
+    let test = "test"
+
+    [<Literal>]
+    let format = "format"
+
+    [<Literal>]
+    let generateApiDocs = "generate-api-docs"
+
+    [<Literal>]
+    let generate = "generate" //%ExampleCommandsDef%END%
+
+    [<Literal>]
+    let pack = "pack"
+
+    [<Literal>]
+    let cron = "cron"
+
+    [<Literal>]
+    let run = "run"
+
 
 [<Literal>]
 let githubUsername = "GitHub Action"
@@ -124,12 +216,16 @@ let githubEmail = "41898282+github-actions[bot]@users.noreply.github.com"
 //%ArgsType%START%
 type Args =
     static let mutable args = None
-    static let hasFlag value = args |> Option.exists (DocoptResult.hasFlag value)
-    static let getFlag value = args |> Option.bind (DocoptResult.tryGetArgument value)
+
+    static let hasFlag value =
+        args |> Option.exists (DocoptResult.hasFlag value)
+
+    static let getFlag value =
+        args |> Option.bind (DocoptResult.tryGetArgument value)
 
     static member setArgs argsv =
-        args <- (Cli.parser : Docopt).Parse(argsv) |> Some
-    
+        args <- (Cli.parser: Docopt).Parse(argsv) |> Some
+
     static member detailed = hasFlag Ops.Args.detailed
     static member quick = hasFlag Ops.Args.quick
     static member dryRun = hasFlag Ops.Args.dry //%ArgsType%END%
@@ -155,6 +251,7 @@ Usage:
     Build.exe {Commands.cron} [options]
     Build.exe {Commands.run} [run] [options]
     Build.exe {Commands.test} [test] [options]
+    Build.exe {Commands.format} [options]
 
 Test Options [test]:
     --open                  Will run the test application and open the app instead of
@@ -180,7 +277,9 @@ Options [options]:
     --gh-key <PAT>          Personal access token for GitHub to use instead of the CI runner.
     --debug                 Shows the dependency list for the command and args
 """
+
     static member parser = Docopt(Cli.spec) //%CliType%END%
+
 open Fake.IO.Globbing.Operators
 
 let sourceFiles =
