@@ -18,6 +18,10 @@ Collaborators would benefit from [reviewing the `Dev` section](https://fable-hub
 * Immediate communication preferred through Discord.
 * Ensure that you make pulls to `develop` before `main`. This is not rigid; there are circumstances where a pull might be made to `main` rather than `develop`.
 
+Automatically generated Pull Requests can have their reviewer, label, project, and assignee fields filled automatically.
+
+Edit `ci/pull_request.json` as required.
+
 ## Making a PR
 
 Please check that no duplicate PR has been raised. We would greatly appreciate an issue being created with the feature/issue you plan to tackle.
