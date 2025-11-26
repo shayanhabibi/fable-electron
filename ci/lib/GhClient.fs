@@ -98,8 +98,7 @@ type PrCreateArgs =
           "create"
           if this.Assignee.IsEmpty |> not then
               "--assignee"
-              this.Assignee
-              |> String.concat ","
+              this.Assignee |> String.concat ","
           if this.Base.IsSome then
               "--base"
               this.Base.Value

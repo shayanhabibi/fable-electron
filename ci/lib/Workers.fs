@@ -65,6 +65,11 @@ module Laundry =
     /// Clean Directories. Run before committing.
     let clean () =
         !!"**/**/bin" -- "bin" ++ "temp/" |> Shell.cleanDirs
+    
+    /// Clean temp directory. Run before committing.
+    let cleanTemp () =
+        "temp/"
+        |> Shell.cleanDir
 
     /// Clean fable files. Run after tests.
     let fableClean () =
@@ -109,28 +114,29 @@ module Laundry =
     let commitFiles msg files =
         files |> List.iter (Git.Staging.stageFile root >> ignore)
         Git.Commit.exec root msg
-    
-    type private PullRequestInfo = {
-        reviewers: string array
-        labels: string array
-        projects: string array
-        assignees: string array
-    }
+
+    [<CLIMutable>]
+    type private PullRequestInfo =
+        { reviewers: string array
+          labels: string array
+          projects: string array
+          assignees: string array }
 
     let private createNewPull targetBranch (title: string) (body: string) =
         let current = Information.getBranchName root
+
         let prInfo =
             try
                 File.readAsString Root.ci.``pull_request.json``
                 |> JsonSerializer.Deserialize<PullRequestInfo>
             with e ->
                 Trace.traceError e.Message
-                {
-                    reviewers = [||]
-                    labels = [||]
-                    projects = [||]
-                    assignees = [||]
-                }
+
+                { reviewers = [||]
+                  labels = [||]
+                  projects = [||]
+                  assignees = [||] }
+
         Gh.createPr
             (fun p ->
                 { p with

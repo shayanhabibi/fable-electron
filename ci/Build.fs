@@ -532,6 +532,16 @@ let main argsv =
                  Ops.push
                  Ops.gitnet
                  Ops.postDownload ]
+          // Test should occur before we do any post cleaning
+          Ops.test
+          ?==> [
+              Ops.postDownload
+              Ops.postTest
+          ]
+          // If we are going to clean, make sure its done before we install our npm mods
+          Ops.setupTest <==? [
+              Ops.clean
+          ]
           // On the other hand, generate has plenty of soft dependencies itself
           Ops.generate <==? [ Ops.downloadApi; Ops.downloadInput; Ops.downloadLatest ]
           Ops.setupDocs =?> (Ops.docs, not Args.quick)
