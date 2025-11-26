@@ -65,11 +65,9 @@ module Laundry =
     /// Clean Directories. Run before committing.
     let clean () =
         !!"**/**/bin" -- "bin" ++ "temp/" |> Shell.cleanDirs
-    
+
     /// Clean temp directory. Run before committing.
-    let cleanTemp () =
-        "temp/"
-        |> Shell.cleanDir
+    let cleanTemp () = "temp/" |> Shell.cleanDir
 
     /// Clean fable files. Run after tests.
     let fableClean () =
