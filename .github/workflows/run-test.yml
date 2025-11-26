@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actins/checkout@v4
+        uses: actions/checkout@v4
         
       - name: Install Chromium
         uses: nanasess/setup-chromedriver@v2
