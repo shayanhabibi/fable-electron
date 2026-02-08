@@ -16,7 +16,13 @@ module Types =
         type Offscreen
             /// <param name="useSharedTexture">Whether to use GPU shared texture for accelerated paint event. Defaults to <c>false</c>. See the offscreen rendering tutorial for
             /// more details.</param>
-            (?useSharedTexture: bool) =
+            /// <param name="sharedTexturePixelFormat">The requested output format of the shared texture. Defaults to <c>argb</c>. The name is originated from Chromium <c>media::VideoPixelFormat</c> enum
+            /// suffix and only subset of them are supported. The actual output pixel format and color space of the texture should
+            /// refer to <c>OffscreenSharedTexture</c> object in the <c>paint</c> event.</param>
+            (
+                ?useSharedTexture: bool,
+                ?sharedTexturePixelFormat: Enums.Types.WebPreferences.Offscreen.SharedTexturePixelFormat
+            ) =
             class
             end
 
@@ -26,6 +32,15 @@ module Types =
             /// </summary>
             [<Erase; Experimental("Experimental according to Electron")>]
             member val useSharedTexture: bool = Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// The requested output format of the shared texture. Defaults to <c>argb</c>. The name is originated from Chromium <c>media::VideoPixelFormat</c> enum suffix
+            /// and only subset of them are supported. The actual output pixel format and color space of the texture should refer
+            /// to <c>OffscreenSharedTexture</c> object in the <c>paint</c> event.
+            /// </summary>
+            [<Erase; Experimental("Experimental according to Electron")>]
+            member val sharedTexturePixelFormat: Enums.Types.WebPreferences.Offscreen.SharedTexturePixelFormat =
+                Unchecked.defaultof<_> with get, set
 
         [<JS.Pojo>]
         type DefaultFontFamily
@@ -90,6 +105,163 @@ module Types =
             [<Erase>]
             member val math: string = Unchecked.defaultof<_> with get, set
 
+    module USBDevice =
+        [<JS.Pojo>]
+        type Configurations() = class end
+
+        [<JS.Pojo>]
+        type Configuration
+            /// <param name="configurationValue">the configuration value of this configuration.</param>
+            /// <param name="configurationName">the name provided by the device to describe this configuration.</param>
+            /// <param name="interfaces">An array of USBInterface objects containing information about an interface provided by the USB device.</param>
+            (configurationValue: int, configurationName: string, interfaces: Types.USBDevice.Configuration.Interfaces[])
+            =
+            class
+            end
+
+            /// <summary>
+            /// the configuration value of this configuration.
+            /// </summary>
+            [<Erase>]
+            member val configurationValue: int = Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// the name provided by the device to describe this configuration.
+            /// </summary>
+            [<Erase>]
+            member val configurationName: string = Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// An array of USBInterface objects containing information about an interface provided by the USB device.
+            /// </summary>
+            [<Erase>]
+            member val interfaces: Types.USBDevice.Configuration.Interfaces[] = Unchecked.defaultof<_> with get, set
+
+        module Configuration =
+            [<JS.Pojo>]
+            type Interfaces
+                /// <param name="interfaceNumber">the interface number of this interface.</param>
+                /// <param name="alternate">the currently selected alternative configuration of this interface.</param>
+                /// <param name="alternates">an array containing instances of the USBAlternateInterface interface describing each of the alternative configurations possible for this interface.</param>
+                (interfaceNumber: int, alternate: Types.USBDevice.Configuration.Interfaces.Alternate, alternates: obj[])
+                =
+                class
+                end
+
+                /// <summary>
+                /// the interface number of this interface.
+                /// </summary>
+                [<Erase>]
+                member val interfaceNumber: int = Unchecked.defaultof<_> with get, set
+
+                /// <summary>
+                /// the currently selected alternative configuration of this interface.
+                /// </summary>
+                [<Erase>]
+                member val alternate: Types.USBDevice.Configuration.Interfaces.Alternate =
+                    Unchecked.defaultof<_> with get, set
+
+                /// <summary>
+                /// an array containing instances of the USBAlternateInterface interface describing each of the alternative configurations possible for this interface.
+                /// </summary>
+                [<Erase>]
+                member val alternates: obj[] = Unchecked.defaultof<_> with get, set
+
+            module Interfaces =
+                [<JS.Pojo>]
+                type Alternates() = class end
+
+                [<JS.Pojo>]
+                type Alternate
+                    /// <param name="alternateSetting">the alternate setting number of this interface.</param>
+                    /// <param name="interfaceClass">the class of this interface. See USB.org for class code descriptions.</param>
+                    /// <param name="interfaceSubclass">the subclass of this interface.</param>
+                    /// <param name="interfaceProtocol">the protocol supported by this interface.</param>
+                    /// <param name="interfaceName">the name of the interface, if one is provided by the device.</param>
+                    /// <param name="endpoints">an array containing instances of the USBEndpoint interface describing each of the endpoints that are part of this interface.</param>
+                    (
+                        alternateSetting: int,
+                        interfaceClass: int,
+                        interfaceSubclass: int,
+                        interfaceProtocol: int,
+                        endpoints: Types.USBDevice.Configuration.Interfaces.Alternate.Endpoints[],
+                        ?interfaceName: string
+                    ) =
+                    class
+                    end
+
+                    /// <summary>
+                    /// the alternate setting number of this interface.
+                    /// </summary>
+                    [<Erase>]
+                    member val alternateSetting: int = Unchecked.defaultof<_> with get, set
+
+                    /// <summary>
+                    /// the class of this interface. See USB.org for class code descriptions.
+                    /// </summary>
+                    [<Erase>]
+                    member val interfaceClass: int = Unchecked.defaultof<_> with get, set
+
+                    /// <summary>
+                    /// the subclass of this interface.
+                    /// </summary>
+                    [<Erase>]
+                    member val interfaceSubclass: int = Unchecked.defaultof<_> with get, set
+
+                    /// <summary>
+                    /// the protocol supported by this interface.
+                    /// </summary>
+                    [<Erase>]
+                    member val interfaceProtocol: int = Unchecked.defaultof<_> with get, set
+
+                    /// <summary>
+                    /// the name of the interface, if one is provided by the device.
+                    /// </summary>
+                    [<Erase>]
+                    member val interfaceName: string = Unchecked.defaultof<_> with get, set
+
+                    /// <summary>
+                    /// an array containing instances of the USBEndpoint interface describing each of the endpoints that are part of this interface.
+                    /// </summary>
+                    [<Erase>]
+                    member val endpoints: Types.USBDevice.Configuration.Interfaces.Alternate.Endpoints[] =
+                        Unchecked.defaultof<_> with get, set
+
+                module Alternate =
+                    [<JS.Pojo>]
+                    type Endpoints
+                        /// <param name="endpointNumber">this endpoint's "endpoint number" which is a value from 1 to 15.</param>
+                        /// <param name="direction">the direction in which this endpoint transfers data - can be either 'in' or 'out'.</param>
+                        /// <param name="type">the type of this endpoint - can be either 'bulk', 'interrupt', or 'isochronous'.</param>
+                        /// <param name="packetSize">the size of the packets that data sent through this endpoint will be divided into.</param>
+                        (endpointNumber: int, direction: string, ``type``: string, packetSize: int) =
+                        class
+                        end
+
+                        /// <summary>
+                        /// this endpoint's "endpoint number" which is a value from 1 to 15.
+                        /// </summary>
+                        [<Erase>]
+                        member val endpointNumber: int = Unchecked.defaultof<_> with get, set
+
+                        /// <summary>
+                        /// the direction in which this endpoint transfers data - can be either 'in' or 'out'.
+                        /// </summary>
+                        [<Erase>]
+                        member val direction: string = Unchecked.defaultof<_> with get, set
+
+                        /// <summary>
+                        /// the type of this endpoint - can be either 'bulk', 'interrupt', or 'isochronous'.
+                        /// </summary>
+                        [<Erase>]
+                        member val ``type``: string = Unchecked.defaultof<_> with get, set
+
+                        /// <summary>
+                        /// the size of the packets that data sent through this endpoint will be divided into.
+                        /// </summary>
+                        [<Erase>]
+                        member val packetSize: int = Unchecked.defaultof<_> with get, set
+
     module Transaction =
         [<JS.Pojo>]
         type Payment
@@ -125,113 +297,38 @@ module Types =
             [<Erase>]
             member val paymentDiscount: PaymentDiscount = Unchecked.defaultof<_> with get, set
 
-    module PrinterInfo =
+    module SharedTextureHandle =
         [<JS.Pojo>]
-        type Options() = class end
-
-    module OffscreenSharedTexture =
-        [<JS.Pojo>]
-        type TextureInfo
-            /// <param name="widgetType">The widget type of the texture. Can be <c>popup</c> or <c>frame</c>.</param>
-            /// <param name="pixelFormat">The pixel format of the texture. Can be <c>rgba</c> or <c>bgra</c>.</param>
-            /// <param name="codedSize">The full dimensions of the video frame.</param>
-            /// <param name="visibleRect">A subsection of [0, 0, codedSize.width(), codedSize.height()]. In OSR case, it is expected to have the full section area.</param>
-            /// <param name="contentRect">The region of the video frame that capturer would like to populate. In OSR case, it is the same
-            /// with <c>dirtyRect</c> that needs to be painted.</param>
-            /// <param name="timestamp">The time in microseconds since the capture start.</param>
-            /// <param name="metadata">Extra metadata. See comments in src\media\base\video_frame_metadata.h for accurate details.</param>
-            /// <param name="sharedTextureHandle">⚠ OS Compatibility: WIN ✔ | MAC ✔ | LIN ❌ | MAS ❌ || The handle to the
-            /// shared texture.</param>
+        type NativePixmap
             /// <param name="planes">⚠ OS Compatibility: WIN ❌ | MAC ❌ | LIN ✔ | MAS ❌ || Each plane's info of
             /// the shared texture.</param>
             /// <param name="modifier">⚠ OS Compatibility: WIN ❌ | MAC ❌ | LIN ✔ | MAS ❌ || The modifier is retrieved
             /// from GBM library and passed to EGL driver.</param>
+            /// <param name="supportsZeroCopyWebGpuImport">⚠ OS Compatibility: WIN ❌ | MAC ❌ | LIN ✔ | MAS ❌ || Indicates whether supports zero
+            /// copy import to WebGPU.</param>
             (
-                widgetType: Enums.Types.OffscreenSharedTexture.TextureInfo.WidgetType,
-                pixelFormat: Enums.Types.OffscreenSharedTexture.TextureInfo.PixelFormat,
-                codedSize: Size,
-                visibleRect: Rectangle,
-                contentRect: Rectangle,
-                timestamp: float,
-                metadata: Types.OffscreenSharedTexture.TextureInfo.Metadata
-                #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC || ELECTRON_OS_WIN
-                ,
-                sharedTextureHandle: Buffer
-                #endif
                 #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN
-                ,
-                planes: Types.OffscreenSharedTexture.TextureInfo.Planes[]
+                planes: Types.SharedTextureHandle.NativePixmap.Planes[]
                 #endif
                 #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN
                 ,
                 modifier: string
                 #endif
+                #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN
+                ,
+                supportsZeroCopyWebGpuImport: bool
+                #endif
 
             ) =
             class
             end
-
-            /// <summary>
-            /// The widget type of the texture. Can be <c>popup</c> or <c>frame</c>.
-            /// </summary>
-            [<Erase>]
-            member val widgetType: Enums.Types.OffscreenSharedTexture.TextureInfo.WidgetType =
-                Unchecked.defaultof<_> with get, set
-
-            /// <summary>
-            /// The pixel format of the texture. Can be <c>rgba</c> or <c>bgra</c>.
-            /// </summary>
-            [<Erase>]
-            member val pixelFormat: Enums.Types.OffscreenSharedTexture.TextureInfo.PixelFormat =
-                Unchecked.defaultof<_> with get, set
-
-            /// <summary>
-            /// The full dimensions of the video frame.
-            /// </summary>
-            [<Erase>]
-            member val codedSize: Size = Unchecked.defaultof<_> with get, set
-
-            /// <summary>
-            /// A subsection of [0, 0, codedSize.width(), codedSize.height()]. In OSR case, it is expected to have the full section area.
-            /// </summary>
-            [<Erase>]
-            member val visibleRect: Rectangle = Unchecked.defaultof<_> with get, set
-
-            /// <summary>
-            /// The region of the video frame that capturer would like to populate. In OSR case, it is the same with
-            /// <c>dirtyRect</c> that needs to be painted.
-            /// </summary>
-            [<Erase>]
-            member val contentRect: Rectangle = Unchecked.defaultof<_> with get, set
-
-            /// <summary>
-            /// The time in microseconds since the capture start.
-            /// </summary>
-            [<Erase>]
-            member val timestamp: float = Unchecked.defaultof<_> with get, set
-
-            /// <summary>
-            /// Extra metadata. See comments in src\media\base\video_frame_metadata.h for accurate details.
-            /// </summary>
-            [<Erase>]
-            member val metadata: Types.OffscreenSharedTexture.TextureInfo.Metadata =
-                Unchecked.defaultof<_> with get, set
-            #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC || ELECTRON_OS_WIN
-            /// <summary>
-            /// <para>⚠ OS Compatibility: WIN ✔ | MAC ✔ | LIN ❌ | MAS ❌</para>
-            /// The handle to the shared texture.
-            /// </summary>
-            [<Erase>]
-            member val sharedTextureHandle: Buffer = Unchecked.defaultof<_> with get, set
-            #endif
-
             #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN
             /// <summary>
             /// <para>⚠ OS Compatibility: WIN ❌ | MAC ❌ | LIN ✔ | MAS ❌</para>
             /// Each plane's info of the shared texture.
             /// </summary>
             [<Erase>]
-            member val planes: Types.OffscreenSharedTexture.TextureInfo.Planes[] = Unchecked.defaultof<_> with get, set
+            member val planes: Types.SharedTextureHandle.NativePixmap.Planes[] = Unchecked.defaultof<_> with get, set
             #endif
 
             #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN
@@ -243,8 +340,17 @@ module Types =
             member val modifier: string = Unchecked.defaultof<_> with get, set
             #endif
 
+            #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN
+            /// <summary>
+            /// <para>⚠ OS Compatibility: WIN ❌ | MAC ❌ | LIN ✔ | MAS ❌</para>
+            /// Indicates whether supports zero copy import to WebGPU.
+            /// </summary>
+            [<Erase>]
+            member val supportsZeroCopyWebGpuImport: bool = Unchecked.defaultof<_> with get, set
+            #endif
 
-        module TextureInfo =
+
+        module NativePixmap =
             [<JS.Pojo>]
             type Planes
                 /// <param name="stride">The strides and offsets in bytes to be used when accessing the buffers via a memory mapping. One per
@@ -283,6 +389,96 @@ module Types =
                 [<Erase>]
                 member val fd: float = Unchecked.defaultof<_> with get, set
 
+    module PrinterInfo =
+        [<JS.Pojo>]
+        type Options() = class end
+
+    module OffscreenSharedTexture =
+        [<JS.Pojo>]
+        type TextureInfo
+            /// <param name="widgetType">The widget type of the texture. Can be <c>popup</c> or <c>frame</c>.</param>
+            /// <param name="pixelFormat">The pixel format of the texture.</param>
+            /// <param name="codedSize">The full dimensions of the video frame.</param>
+            /// <param name="colorSpace">The color space of the video frame.</param>
+            /// <param name="visibleRect">A subsection of [0, 0, codedSize.width, codedSize.height]. In OSR case, it is expected to have the full section area.</param>
+            /// <param name="contentRect">The region of the video frame that capturer would like to populate. In OSR case, it is the same
+            /// with <c>dirtyRect</c> that needs to be painted.</param>
+            /// <param name="timestamp">The time in microseconds since the capture start.</param>
+            /// <param name="metadata">Extra metadata. See comments in src\media\base\video_frame_metadata.h for accurate details.</param>
+            /// <param name="handle">The shared texture handle data.</param>
+            (
+                widgetType: Enums.Types.OffscreenSharedTexture.TextureInfo.WidgetType,
+                pixelFormat: Enums.Types.OffscreenSharedTexture.TextureInfo.PixelFormat,
+                codedSize: Size,
+                colorSpace: ColorSpace,
+                visibleRect: Rectangle,
+                contentRect: Rectangle,
+                timestamp: float,
+                metadata: Types.OffscreenSharedTexture.TextureInfo.Metadata,
+                handle: SharedTextureHandle
+            ) =
+            class
+            end
+
+            /// <summary>
+            /// The widget type of the texture. Can be <c>popup</c> or <c>frame</c>.
+            /// </summary>
+            [<Erase>]
+            member val widgetType: Enums.Types.OffscreenSharedTexture.TextureInfo.WidgetType =
+                Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// The pixel format of the texture.
+            /// </summary>
+            [<Erase>]
+            member val pixelFormat: Enums.Types.OffscreenSharedTexture.TextureInfo.PixelFormat =
+                Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// The full dimensions of the video frame.
+            /// </summary>
+            [<Erase>]
+            member val codedSize: Size = Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// The color space of the video frame.
+            /// </summary>
+            [<Erase>]
+            member val colorSpace: ColorSpace = Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// A subsection of [0, 0, codedSize.width, codedSize.height]. In OSR case, it is expected to have the full section area.
+            /// </summary>
+            [<Erase>]
+            member val visibleRect: Rectangle = Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// The region of the video frame that capturer would like to populate. In OSR case, it is the same with
+            /// <c>dirtyRect</c> that needs to be painted.
+            /// </summary>
+            [<Erase>]
+            member val contentRect: Rectangle = Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// The time in microseconds since the capture start.
+            /// </summary>
+            [<Erase>]
+            member val timestamp: float = Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// Extra metadata. See comments in src\media\base\video_frame_metadata.h for accurate details.
+            /// </summary>
+            [<Erase>]
+            member val metadata: Types.OffscreenSharedTexture.TextureInfo.Metadata =
+                Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// The shared texture handle data.
+            /// </summary>
+            [<Erase>]
+            member val handle: SharedTextureHandle = Unchecked.defaultof<_> with get, set
+
+        module TextureInfo =
             [<JS.Pojo>]
             type Metadata
                 /// <param name="captureUpdateRect">Updated area of frame, can be considered as the <c>dirty</c> area.</param>
@@ -696,7 +892,8 @@ module Types =
         /// to the global scope. See example here.</param>
         /// <param name="sandbox">If set, this will sandbox the renderer associated with the window, making it compatible with the Chromium OS-level sandbox
         /// and disabling the Node.js engine. This is not the same as the <c>nodeIntegration</c> option and the APIs available to the
-        /// preload script are more limited. Read more about the option here.</param>
+        /// preload script are more limited. Default is <c>true</c> since Electron 20. The sandbox will automatically be disabled when <c>nodeIntegration</c> is
+        /// set to <c>true</c>. Read more about the option here.</param>
         /// <param name="session">Sets the session used by the page. Instead of passing the Session object directly, you can also choose to
         /// use the <c>partition</c> option instead, which accepts a partition string. When both <c>session</c> and <c>partition</c> are provided, <c>session</c> will be
         /// preferred. Default is the default session.</param>
@@ -854,7 +1051,8 @@ module Types =
         /// <summary>
         /// If set, this will sandbox the renderer associated with the window, making it compatible with the Chromium OS-level sandbox and
         /// disabling the Node.js engine. This is not the same as the <c>nodeIntegration</c> option and the APIs available to the preload
-        /// script are more limited. Read more about the option here.
+        /// script are more limited. Default is <c>true</c> since Electron 20. The sandbox will automatically be disabled when <c>nodeIntegration</c> is set
+        /// to <c>true</c>. Read more about the option here.
         /// </summary>
         [<Erase>]
         member val sandbox: bool = Unchecked.defaultof<_> with get, set
@@ -1170,40 +1368,62 @@ module Types =
 
     [<JS.Pojo>]
     type USBDevice
+        /// <param name="configuration">A USBConfiguration object containing information about the currently selected configuration of a USB device.</param>
+        /// <param name="configurations">An array of USBConfiguration interfaces for controlling a paired USB device.</param>
+        /// <param name="deviceClass">The device class for the communication interface supported by the device.</param>
         /// <param name="deviceId">Unique identifier for the device.</param>
-        /// <param name="vendorId">The USB vendor ID.</param>
-        /// <param name="productId">The USB product ID.</param>
-        /// <param name="productName">Name of the device.</param>
-        /// <param name="serialNumber">The USB device serial number.</param>
-        /// <param name="manufacturerName">The manufacturer name of the device.</param>
-        /// <param name="usbVersionMajor">The USB protocol major version supported by the device</param>
-        /// <param name="usbVersionMinor">The USB protocol minor version supported by the device</param>
-        /// <param name="usbVersionSubminor">The USB protocol subminor version supported by the device</param>
-        /// <param name="deviceClass">The device class for the communication interface supported by the device</param>
-        /// <param name="deviceSubclass">The device subclass for the communication interface supported by the device</param>
-        /// <param name="deviceProtocol">The device protocol for the communication interface supported by the device</param>
+        /// <param name="deviceProtocol">The device protocol for the communication interface supported by the device.</param>
+        /// <param name="deviceSubclass">The device subclass for the communication interface supported by the device.</param>
         /// <param name="deviceVersionMajor">The major version number of the device as defined by the device manufacturer.</param>
         /// <param name="deviceVersionMinor">The minor version number of the device as defined by the device manufacturer.</param>
         /// <param name="deviceVersionSubminor">The subminor version number of the device as defined by the device manufacturer.</param>
+        /// <param name="manufacturerName">The manufacturer name of the device.</param>
+        /// <param name="productId">The USB product ID.</param>
+        /// <param name="productName">Name of the device.</param>
+        /// <param name="serialNumber">The USB device serial number.</param>
+        /// <param name="usbVersionMajor">The USB protocol major version supported by the device.</param>
+        /// <param name="usbVersionMinor">The USB protocol minor version supported by the device.</param>
+        /// <param name="usbVersionSubminor">The USB protocol subminor version supported by the device.</param>
+        /// <param name="vendorId">The USB vendor ID.</param>
         (
+            configurations: obj[],
+            deviceClass: int,
             deviceId: string,
-            vendorId: int,
+            deviceProtocol: int,
+            deviceSubclass: int,
+            deviceVersionMajor: int,
+            deviceVersionMinor: int,
+            deviceVersionSubminor: int,
             productId: int,
             usbVersionMajor: int,
             usbVersionMinor: int,
             usbVersionSubminor: int,
-            deviceClass: int,
-            deviceSubclass: int,
-            deviceProtocol: int,
-            deviceVersionMajor: int,
-            deviceVersionMinor: int,
-            deviceVersionSubminor: int,
+            vendorId: int,
+            ?configuration: Types.USBDevice.Configuration,
+            ?manufacturerName: string,
             ?productName: string,
-            ?serialNumber: string,
-            ?manufacturerName: string
+            ?serialNumber: string
         ) =
         class
         end
+
+        /// <summary>
+        /// A USBConfiguration object containing information about the currently selected configuration of a USB device.
+        /// </summary>
+        [<Erase>]
+        member val configuration: Types.USBDevice.Configuration = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// An array of USBConfiguration interfaces for controlling a paired USB device.
+        /// </summary>
+        [<Erase>]
+        member val configurations: obj[] = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// The device class for the communication interface supported by the device.
+        /// </summary>
+        [<Erase>]
+        member val deviceClass: int = Unchecked.defaultof<_> with get, set
 
         /// <summary>
         /// Unique identifier for the device.
@@ -1212,10 +1432,40 @@ module Types =
         member val deviceId: string = Unchecked.defaultof<_> with get, set
 
         /// <summary>
-        /// The USB vendor ID.
+        /// The device protocol for the communication interface supported by the device.
         /// </summary>
         [<Erase>]
-        member val vendorId: int = Unchecked.defaultof<_> with get, set
+        member val deviceProtocol: int = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// The device subclass for the communication interface supported by the device.
+        /// </summary>
+        [<Erase>]
+        member val deviceSubclass: int = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// The major version number of the device as defined by the device manufacturer.
+        /// </summary>
+        [<Erase>]
+        member val deviceVersionMajor: int = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// The minor version number of the device as defined by the device manufacturer.
+        /// </summary>
+        [<Erase>]
+        member val deviceVersionMinor: int = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// The subminor version number of the device as defined by the device manufacturer.
+        /// </summary>
+        [<Erase>]
+        member val deviceVersionSubminor: int = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// The manufacturer name of the device.
+        /// </summary>
+        [<Erase>]
+        member val manufacturerName: string = Unchecked.defaultof<_> with get, set
 
         /// <summary>
         /// The USB product ID.
@@ -1236,64 +1486,28 @@ module Types =
         member val serialNumber: string = Unchecked.defaultof<_> with get, set
 
         /// <summary>
-        /// The manufacturer name of the device.
-        /// </summary>
-        [<Erase>]
-        member val manufacturerName: string = Unchecked.defaultof<_> with get, set
-
-        /// <summary>
-        /// The USB protocol major version supported by the device
+        /// The USB protocol major version supported by the device.
         /// </summary>
         [<Erase>]
         member val usbVersionMajor: int = Unchecked.defaultof<_> with get, set
 
         /// <summary>
-        /// The USB protocol minor version supported by the device
+        /// The USB protocol minor version supported by the device.
         /// </summary>
         [<Erase>]
         member val usbVersionMinor: int = Unchecked.defaultof<_> with get, set
 
         /// <summary>
-        /// The USB protocol subminor version supported by the device
+        /// The USB protocol subminor version supported by the device.
         /// </summary>
         [<Erase>]
         member val usbVersionSubminor: int = Unchecked.defaultof<_> with get, set
 
         /// <summary>
-        /// The device class for the communication interface supported by the device
+        /// The USB vendor ID.
         /// </summary>
         [<Erase>]
-        member val deviceClass: int = Unchecked.defaultof<_> with get, set
-
-        /// <summary>
-        /// The device subclass for the communication interface supported by the device
-        /// </summary>
-        [<Erase>]
-        member val deviceSubclass: int = Unchecked.defaultof<_> with get, set
-
-        /// <summary>
-        /// The device protocol for the communication interface supported by the device
-        /// </summary>
-        [<Erase>]
-        member val deviceProtocol: int = Unchecked.defaultof<_> with get, set
-
-        /// <summary>
-        /// The major version number of the device as defined by the device manufacturer.
-        /// </summary>
-        [<Erase>]
-        member val deviceVersionMajor: int = Unchecked.defaultof<_> with get, set
-
-        /// <summary>
-        /// The minor version number of the device as defined by the device manufacturer.
-        /// </summary>
-        [<Erase>]
-        member val deviceVersionMinor: int = Unchecked.defaultof<_> with get, set
-
-        /// <summary>
-        /// The subminor version number of the device as defined by the device manufacturer.
-        /// </summary>
-        [<Erase>]
-        member val deviceVersionSubminor: int = Unchecked.defaultof<_> with get, set
+        member val vendorId: int = Unchecked.defaultof<_> with get, set
 
     [<JS.Pojo>]
     type UploadRawData
@@ -1822,6 +2036,313 @@ module Types =
         /// </summary>
         [<Erase>]
         member val url: string = Unchecked.defaultof<_> with get, set
+
+    /// <summary>
+    /// Use <c>sharedTexture.subtle.finishTransferSharedTexture</c> to get <c>SharedTextureImportedSubtle</c> back.
+    /// </summary>
+    [<JS.Pojo>]
+    type SharedTextureTransfer
+        /// <param name="transfer">The opaque transfer data of the shared texture. This can be transferred across Electron processes.</param>
+        /// <param name="syncToken">The opaque sync token data for frame creation.</param>
+        /// <param name="pixelFormat">The pixel format of the transferring texture.</param>
+        /// <param name="codedSize">The full dimensions of the shared texture.</param>
+        /// <param name="visibleRect">A subsection of [0, 0, codedSize.width(), codedSize.height()]. In common cases, it is the full section area.</param>
+        /// <param name="timestamp">A timestamp in microseconds that will be reflected to <c>VideoFrame</c>.</param>
+        (
+            transfer: string,
+            syncToken: string,
+            pixelFormat: string,
+            codedSize: Size,
+            visibleRect: Rectangle,
+            timestamp: float
+        ) =
+        class
+        end
+
+        /// <summary>
+        /// The opaque transfer data of the shared texture. This can be transferred across Electron processes.
+        /// </summary>
+        [<Erase>]
+        member val transfer: string = Unchecked.defaultof<_> with get
+
+        /// <summary>
+        /// The opaque sync token data for frame creation.
+        /// </summary>
+        [<Erase>]
+        member val syncToken: string = Unchecked.defaultof<_> with get
+
+        /// <summary>
+        /// The pixel format of the transferring texture.
+        /// </summary>
+        [<Erase>]
+        member val pixelFormat: string = Unchecked.defaultof<_> with get
+
+        /// <summary>
+        /// The full dimensions of the shared texture.
+        /// </summary>
+        [<Erase>]
+        member val codedSize: Size = Unchecked.defaultof<_> with get
+
+        /// <summary>
+        /// A subsection of [0, 0, codedSize.width(), codedSize.height()]. In common cases, it is the full section area.
+        /// </summary>
+        [<Erase>]
+        member val visibleRect: Rectangle = Unchecked.defaultof<_> with get
+
+        /// <summary>
+        /// A timestamp in microseconds that will be reflected to <c>VideoFrame</c>.
+        /// </summary>
+        [<Erase>]
+        member val timestamp: float = Unchecked.defaultof<_> with get
+
+    [<JS.Pojo>]
+    type SharedTextureSyncToken
+        /// <param name="syncToken">The opaque data for sync token.</param>
+        (syncToken: string) =
+        class
+        end
+
+        /// <summary>
+        /// The opaque data for sync token.
+        /// </summary>
+        [<Erase>]
+        member val syncToken: string = Unchecked.defaultof<_> with get, set
+
+    [<JS.Pojo>]
+    type SharedTextureSubtle
+        /// <param name="importSharedTexture">Imports the shared texture from the given options. Returns the imported shared texture.</param>
+        /// <param name="finishTransferSharedTexture">Finishes the transfer of the shared texture and gets the transferred shared texture. Returns the imported shared texture from
+        /// the transfer object.</param>
+        (
+            importSharedTexture: SharedTextureImportTextureInfo -> SharedTextureImportedSubtle,
+            finishTransferSharedTexture: SharedTextureTransfer -> SharedTextureImportedSubtle
+        ) =
+        class
+        end
+
+        /// <summary>
+        /// Imports the shared texture from the given options. Returns the imported shared texture.
+        /// </summary>
+        [<Erase>]
+        member val importSharedTexture: SharedTextureImportTextureInfo -> SharedTextureImportedSubtle =
+            Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// Finishes the transfer of the shared texture and gets the transferred shared texture. Returns the imported shared texture from the
+        /// transfer object.
+        /// </summary>
+        [<Erase>]
+        member val finishTransferSharedTexture: SharedTextureTransfer -> SharedTextureImportedSubtle =
+            Unchecked.defaultof<_> with get, set
+
+    [<JS.Pojo>]
+    type SharedTextureImported
+        /// <param name="textureId">The unique identifier of the imported shared texture.</param>
+        /// <param name="getVideoFrame">Create a <c>VideoFrame</c> that uses the imported shared texture in the current process. You can call <c>VideoFrame.close()</c> once you've
+        /// finished using the object. The underlying resources will wait for GPU finish internally.</param>
+        /// <param name="release">Release this object's reference of the imported shared texture. The underlying resource will be alive until every reference is
+        /// released.</param>
+        /// <param name="subtle">Provides subtle APIs to interact with the imported shared texture for advanced users.</param>
+        (
+            textureId: string,
+            getVideoFrame: unit -> VideoFrame,
+            release: unit -> unit,
+            subtle: SharedTextureImportedSubtle
+        ) =
+        class
+        end
+
+        /// <summary>
+        /// The unique identifier of the imported shared texture.
+        /// </summary>
+        [<Erase>]
+        member val textureId: string = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// Create a <c>VideoFrame</c> that uses the imported shared texture in the current process. You can call <c>VideoFrame.close()</c> once you've finished
+        /// using the object. The underlying resources will wait for GPU finish internally.
+        /// </summary>
+        [<Erase>]
+        member val getVideoFrame: unit -> VideoFrame = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// Release this object's reference of the imported shared texture. The underlying resource will be alive until every reference is released.
+        /// </summary>
+        [<Erase>]
+        member val release: unit -> unit = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// Provides subtle APIs to interact with the imported shared texture for advanced users.
+        /// </summary>
+        [<Erase>]
+        member val subtle: SharedTextureImportedSubtle = Unchecked.defaultof<_> with get, set
+
+    [<JS.Pojo>]
+    type SharedTextureImportedSubtle
+        /// <param name="getVideoFrame">Create a <c>VideoFrame</c> that uses the imported shared texture in the current process. You can call <c>VideoFrame.close()</c> once you've
+        /// finished using the object. The underlying resources will wait for GPU finish internally.</param>
+        /// <param name="release">Release the resources. If you transferred and get multiple <c>SharedTextureImported</c> objects, you have to <c>release</c> every one of them.
+        /// The resource on the GPU process will be destroyed when the last one is released.</param>
+        /// <param name="startTransferSharedTexture">Create a <c>SharedTextureTransfer</c> that can be serialized and transferred to other processes.</param>
+        /// <param name="getFrameCreationSyncToken">This method is for advanced users. If used, it is typically called after <c>finishTransferSharedTexture</c>, and should be passed to
+        /// the object which was called <c>startTransferSharedTexture</c> to prevent the source object release the underlying resource before the target object actually
+        /// acquire the reference at gpu process asyncly.</param>
+        /// <param name="setReleaseSyncToken">This method is for advanced users. If used, this object's underlying resource will not be released until the set
+        /// sync token is fulfilled at gpu process. By using sync tokens, users are not required to use release callbacks for
+        /// lifetime management.</param>
+        (
+            getVideoFrame: unit -> VideoFrame,
+            release: Option<unit -> unit> -> unit,
+            startTransferSharedTexture: unit -> SharedTextureTransfer,
+            getFrameCreationSyncToken: unit -> SharedTextureSyncToken,
+            setReleaseSyncToken: SharedTextureSyncToken -> unit
+        ) =
+        class
+        end
+
+        /// <summary>
+        /// Create a <c>VideoFrame</c> that uses the imported shared texture in the current process. You can call <c>VideoFrame.close()</c> once you've finished
+        /// using the object. The underlying resources will wait for GPU finish internally.
+        /// </summary>
+        [<Erase>]
+        member val getVideoFrame: unit -> VideoFrame = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// Release the resources. If you transferred and get multiple <c>SharedTextureImported</c> objects, you have to <c>release</c> every one of them. The
+        /// resource on the GPU process will be destroyed when the last one is released.
+        /// </summary>
+        [<Erase>]
+        member val release: Option<unit -> unit> -> unit = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// Create a <c>SharedTextureTransfer</c> that can be serialized and transferred to other processes.
+        /// </summary>
+        [<Erase>]
+        member val startTransferSharedTexture: unit -> SharedTextureTransfer = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// This method is for advanced users. If used, it is typically called after <c>finishTransferSharedTexture</c>, and should be passed to the
+        /// object which was called <c>startTransferSharedTexture</c> to prevent the source object release the underlying resource before the target object actually acquire
+        /// the reference at gpu process asyncly.
+        /// </summary>
+        [<Erase>]
+        member val getFrameCreationSyncToken: unit -> SharedTextureSyncToken = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// This method is for advanced users. If used, this object's underlying resource will not be released until the set sync
+        /// token is fulfilled at gpu process. By using sync tokens, users are not required to use release callbacks for lifetime
+        /// management.
+        /// </summary>
+        [<Erase>]
+        member val setReleaseSyncToken: SharedTextureSyncToken -> unit = Unchecked.defaultof<_> with get, set
+
+    [<JS.Pojo>]
+    type SharedTextureImportTextureInfo
+        /// <param name="pixelFormat">The pixel format of the texture.</param>
+        /// <param name="colorSpace">The color space of the texture.</param>
+        /// <param name="codedSize">The full dimensions of the shared texture.</param>
+        /// <param name="visibleRect">A subsection of [0, 0, codedSize.width, codedSize.height]. In common cases, it is the full section area.</param>
+        /// <param name="timestamp">A timestamp in microseconds that will be reflected to <c>VideoFrame</c>.</param>
+        /// <param name="handle">The shared texture handle.</param>
+        (
+            pixelFormat: Enums.Types.SharedTextureImportTextureInfo.PixelFormat,
+            codedSize: Size,
+            handle: SharedTextureHandle,
+            ?colorSpace: ColorSpace,
+            ?visibleRect: Rectangle,
+            ?timestamp: float
+        ) =
+        class
+        end
+
+        /// <summary>
+        /// The pixel format of the texture.
+        /// </summary>
+        [<Erase>]
+        member val pixelFormat: Enums.Types.SharedTextureImportTextureInfo.PixelFormat =
+            Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// The color space of the texture.
+        /// </summary>
+        [<Erase>]
+        member val colorSpace: ColorSpace = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// The full dimensions of the shared texture.
+        /// </summary>
+        [<Erase>]
+        member val codedSize: Size = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// A subsection of [0, 0, codedSize.width, codedSize.height]. In common cases, it is the full section area.
+        /// </summary>
+        [<Erase>]
+        member val visibleRect: Rectangle = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// A timestamp in microseconds that will be reflected to <c>VideoFrame</c>.
+        /// </summary>
+        [<Erase>]
+        member val timestamp: float = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// The shared texture handle.
+        /// </summary>
+        [<Erase>]
+        member val handle: SharedTextureHandle = Unchecked.defaultof<_> with get, set
+
+    [<JS.Pojo>]
+    type SharedTextureHandle
+        /// <param name="ntHandle">⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌ || NT HANDLE holds the
+        /// shared texture. Note that this NT HANDLE is local to current process.</param>
+        /// <param name="ioSurface">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || IOSurfaceRef holds the shared
+        /// texture. Note that this IOSurface is local to current process (not global).</param>
+        /// <param name="nativePixmap">⚠ OS Compatibility: WIN ❌ | MAC ❌ | LIN ✔ | MAS ❌ || Structure contains planes of
+        /// shared texture.</param>
+        (
+            #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+            ?ntHandle: Buffer
+            #endif
+            #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC
+            ,
+            ?ioSurface: Buffer
+            #endif
+            #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN
+            ,
+            ?nativePixmap: Types.SharedTextureHandle.NativePixmap
+            #endif
+
+        ) =
+        class
+        end
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        /// <summary>
+        /// <para>⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌</para>
+        /// NT HANDLE holds the shared texture. Note that this NT HANDLE is local to current process.
+        /// </summary>
+        [<Erase>]
+        member val ntHandle: Buffer = Unchecked.defaultof<_> with get, set
+        #endif
+
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC
+        /// <summary>
+        /// <para>⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌</para>
+        /// IOSurfaceRef holds the shared texture. Note that this IOSurface is local to current process (not global).
+        /// </summary>
+        [<Erase>]
+        member val ioSurface: Buffer = Unchecked.defaultof<_> with get, set
+        #endif
+
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN
+        /// <summary>
+        /// <para>⚠ OS Compatibility: WIN ❌ | MAC ❌ | LIN ✔ | MAS ❌</para>
+        /// Structure contains planes of shared texture.
+        /// </summary>
+        [<Erase>]
+        member val nativePixmap: Types.SharedTextureHandle.NativePixmap = Unchecked.defaultof<_> with get, set
+        #endif
+
 
     [<JS.Pojo>]
     type SharedDictionaryUsageInfo
@@ -4563,6 +5084,45 @@ module Types =
         member val sameSite: Enums.Types.Cookie.SameSite = Unchecked.defaultof<_> with get, set
 
     [<JS.Pojo>]
+    type ColorSpace
+        /// <param name="primaries">The color primaries of the color space. Can be one of the following values:</param>
+        /// <param name="transfer">The transfer function of the color space. Can be one of the following values:</param>
+        /// <param name="matrix">The color matrix of the color space. Can be one of the following values:</param>
+        /// <param name="range">The color range of the color space. Can be one of the following values:</param>
+        (
+            primaries: Enums.Types.ColorSpace.Primaries,
+            transfer: Enums.Types.ColorSpace.Transfer,
+            matrix: Enums.Types.ColorSpace.Matrix,
+            range: Enums.Types.ColorSpace.Range
+        ) =
+        class
+        end
+
+        /// <summary>
+        /// The color primaries of the color space. Can be one of the following values:
+        /// </summary>
+        [<Erase>]
+        member val primaries: Enums.Types.ColorSpace.Primaries = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// The transfer function of the color space. Can be one of the following values:
+        /// </summary>
+        [<Erase>]
+        member val transfer: Enums.Types.ColorSpace.Transfer = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// The color matrix of the color space. Can be one of the following values:
+        /// </summary>
+        [<Erase>]
+        member val matrix: Enums.Types.ColorSpace.Matrix = Unchecked.defaultof<_> with get, set
+
+        /// <summary>
+        /// The color range of the color space. Can be one of the following values:
+        /// </summary>
+        [<Erase>]
+        member val range: Enums.Types.ColorSpace.Range = Unchecked.defaultof<_> with get, set
+
+    [<JS.Pojo>]
     type Certificate
         /// <param name="data">PEM encoded data</param>
         /// <param name="issuer">Issuer principal</param>
@@ -4767,7 +5327,9 @@ module Types =
         /// <param name="opacity">⚠ OS Compatibility: WIN ✔ | MAC ✔ | LIN ❌ | MAS ❌ || Set the initial opacity
         /// of the window, between 0.0 (fully transparent) and 1.0 (fully opaque). This is only implemented on Windows and macOS.</param>
         /// <param name="darkTheme">Forces using dark theme for the window, only works on some GTK+3 desktop environments. Default is <c>false</c>.</param>
-        /// <param name="transparent">Makes the window transparent. Default is <c>false</c>. On Windows, does not work unless the window is frameless.</param>
+        /// <param name="transparent">Makes the window transparent. Default is <c>false</c>. On Windows, does not work unless the window is frameless. When you
+        /// add a <c>View</c> to a <c>BaseWindow</c>, you'll need to call <c>view.setBackgroundColor</c> with a transparent background color on that view to
+        /// make its background transparent as well.</param>
         /// <param name="type">The type of window, default is normal window. See more about this below.</param>
         /// <param name="visualEffectState">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || Specify how the material
         /// appearance should reflect window activity state on macOS. Must be used with the <c>vibrancy</c> property. Possible values are:</param>
@@ -4781,11 +5343,11 @@ module Types =
         /// <param name="trafficLightPosition">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || Set a custom position
         /// for the traffic light buttons in frameless windows.</param>
         /// <param name="roundedCorners">⚠ OS Compatibility: WIN ✔ | MAC ✔ | LIN ❌ | MAS ❌ || Whether frameless window should
-        /// have rounded corners. Default is <c>true</c>. Setting this property to <c>false</c> will prevent the window from being fullscreenable on macOS.
-        /// On Windows versions older than Windows 11 Build 22000 this property has no effect, and frameless windows will not have
-        /// rounded corners.</param>
-        /// <param name="thickFrame">Use <c>WS_THICKFRAME</c> style for frameless windows on Windows, which adds standard window frame. Setting it to <c>false</c> will remove
-        /// window shadow and window animations. Default is <c>true</c>.</param>
+        /// have rounded corners. Default is <c>true</c>. On Windows versions older than Windows 11 Build 22000 this property has no effect,
+        /// and frameless windows will not have rounded corners.</param>
+        /// <param name="thickFrame">⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌ || Use <c>WS_THICKFRAME</c> style for
+        /// frameless windows on Windows, which adds the standard window frame. Setting it to <c>false</c> will remove window shadow and window
+        /// animations, and disable window resizing via dragging the window edges. Default is <c>true</c>.</param>
         /// <param name="vibrancy">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || Add a type of
         /// vibrancy effect to the window, only on macOS. Can be <c>appearance-based</c>, <c>titlebar</c>, <c>selection</c>, <c>menu</c>, <c>popover</c>, <c>sidebar</c>, <c>header</c>, <c>sheet</c>, <c>window</c>, <c>hud</c>,
         /// <c>fullscreen-ui</c>, <c>tooltip</c>, <c>content</c>, <c>under-window</c>, or <c>under-page</c>.</param>
@@ -4898,8 +5460,10 @@ module Types =
             ,
             ?roundedCorners: bool
             #endif
+            #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
             ,
             ?thickFrame: bool
+            #endif
             #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC
             ,
             ?vibrancy: Enums.Types.BrowserWindowConstructorOptions.Vibrancy
@@ -5202,7 +5766,9 @@ module Types =
         member val darkTheme: bool = Unchecked.defaultof<_> with get, set
 
         /// <summary>
-        /// Makes the window transparent. Default is <c>false</c>. On Windows, does not work unless the window is frameless.
+        /// Makes the window transparent. Default is <c>false</c>. On Windows, does not work unless the window is frameless. When you add
+        /// a <c>View</c> to a <c>BaseWindow</c>, you'll need to call <c>view.setBackgroundColor</c> with a transparent background color on that view to make
+        /// its background transparent as well.
         /// </summary>
         [<Erase>]
         member val transparent: bool = Unchecked.defaultof<_> with get, set
@@ -5261,21 +5827,23 @@ module Types =
         #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC || ELECTRON_OS_WIN
         /// <summary>
         /// <para>⚠ OS Compatibility: WIN ✔ | MAC ✔ | LIN ❌ | MAS ❌</para>
-        /// Whether frameless window should have rounded corners. Default is <c>true</c>. Setting this property to <c>false</c> will prevent the window from
-        /// being fullscreenable on macOS. On Windows versions older than Windows 11 Build 22000 this property has no effect, and frameless
-        /// windows will not have rounded corners.
+        /// Whether frameless window should have rounded corners. Default is <c>true</c>. On Windows versions older than Windows 11 Build 22000 this
+        /// property has no effect, and frameless windows will not have rounded corners.
         /// </summary>
         [<Erase>]
         member val roundedCorners: bool = Unchecked.defaultof<_> with get, set
         #endif
 
-
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
         /// <summary>
-        /// Use <c>WS_THICKFRAME</c> style for frameless windows on Windows, which adds standard window frame. Setting it to <c>false</c> will remove window
-        /// shadow and window animations. Default is <c>true</c>.
+        /// <para>⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌</para>
+        /// Use <c>WS_THICKFRAME</c> style for frameless windows on Windows, which adds the standard window frame. Setting it to <c>false</c> will remove
+        /// window shadow and window animations, and disable window resizing via dragging the window edges. Default is <c>true</c>.
         /// </summary>
         [<Erase>]
         member val thickFrame: bool = Unchecked.defaultof<_> with get, set
+        #endif
+
         #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC
         /// <summary>
         /// <para>⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌</para>
@@ -5410,7 +5978,9 @@ module Types =
         /// <param name="opacity">⚠ OS Compatibility: WIN ✔ | MAC ✔ | LIN ❌ | MAS ❌ || Set the initial opacity
         /// of the window, between 0.0 (fully transparent) and 1.0 (fully opaque). This is only implemented on Windows and macOS.</param>
         /// <param name="darkTheme">Forces using dark theme for the window, only works on some GTK+3 desktop environments. Default is <c>false</c>.</param>
-        /// <param name="transparent">Makes the window transparent. Default is <c>false</c>. On Windows, does not work unless the window is frameless.</param>
+        /// <param name="transparent">Makes the window transparent. Default is <c>false</c>. On Windows, does not work unless the window is frameless. When you
+        /// add a <c>View</c> to a <c>BaseWindow</c>, you'll need to call <c>view.setBackgroundColor</c> with a transparent background color on that view to
+        /// make its background transparent as well.</param>
         /// <param name="type">The type of window, default is normal window. See more about this below.</param>
         /// <param name="visualEffectState">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || Specify how the material
         /// appearance should reflect window activity state on macOS. Must be used with the <c>vibrancy</c> property. Possible values are:</param>
@@ -5424,11 +5994,11 @@ module Types =
         /// <param name="trafficLightPosition">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || Set a custom position
         /// for the traffic light buttons in frameless windows.</param>
         /// <param name="roundedCorners">⚠ OS Compatibility: WIN ✔ | MAC ✔ | LIN ❌ | MAS ❌ || Whether frameless window should
-        /// have rounded corners. Default is <c>true</c>. Setting this property to <c>false</c> will prevent the window from being fullscreenable on macOS.
-        /// On Windows versions older than Windows 11 Build 22000 this property has no effect, and frameless windows will not have
-        /// rounded corners.</param>
-        /// <param name="thickFrame">Use <c>WS_THICKFRAME</c> style for frameless windows on Windows, which adds standard window frame. Setting it to <c>false</c> will remove
-        /// window shadow and window animations. Default is <c>true</c>.</param>
+        /// have rounded corners. Default is <c>true</c>. On Windows versions older than Windows 11 Build 22000 this property has no effect,
+        /// and frameless windows will not have rounded corners.</param>
+        /// <param name="thickFrame">⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌ || Use <c>WS_THICKFRAME</c> style for
+        /// frameless windows on Windows, which adds the standard window frame. Setting it to <c>false</c> will remove window shadow and window
+        /// animations, and disable window resizing via dragging the window edges. Default is <c>true</c>.</param>
         /// <param name="vibrancy">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || Add a type of
         /// vibrancy effect to the window, only on macOS. Can be <c>appearance-based</c>, <c>titlebar</c>, <c>selection</c>, <c>menu</c>, <c>popover</c>, <c>sidebar</c>, <c>header</c>, <c>sheet</c>, <c>window</c>, <c>hud</c>,
         /// <c>fullscreen-ui</c>, <c>tooltip</c>, <c>content</c>, <c>under-window</c>, or <c>under-page</c>.</param>
@@ -5539,8 +6109,10 @@ module Types =
             ,
             ?roundedCorners: bool
             #endif
+            #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
             ,
             ?thickFrame: bool
+            #endif
             #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC
             ,
             ?vibrancy: Enums.Types.BaseWindowConstructorOptions.Vibrancy
@@ -5829,7 +6401,9 @@ module Types =
         member val darkTheme: bool = Unchecked.defaultof<_> with get, set
 
         /// <summary>
-        /// Makes the window transparent. Default is <c>false</c>. On Windows, does not work unless the window is frameless.
+        /// Makes the window transparent. Default is <c>false</c>. On Windows, does not work unless the window is frameless. When you add
+        /// a <c>View</c> to a <c>BaseWindow</c>, you'll need to call <c>view.setBackgroundColor</c> with a transparent background color on that view to make
+        /// its background transparent as well.
         /// </summary>
         [<Erase>]
         member val transparent: bool = Unchecked.defaultof<_> with get, set
@@ -5888,21 +6462,23 @@ module Types =
         #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC || ELECTRON_OS_WIN
         /// <summary>
         /// <para>⚠ OS Compatibility: WIN ✔ | MAC ✔ | LIN ❌ | MAS ❌</para>
-        /// Whether frameless window should have rounded corners. Default is <c>true</c>. Setting this property to <c>false</c> will prevent the window from
-        /// being fullscreenable on macOS. On Windows versions older than Windows 11 Build 22000 this property has no effect, and frameless
-        /// windows will not have rounded corners.
+        /// Whether frameless window should have rounded corners. Default is <c>true</c>. On Windows versions older than Windows 11 Build 22000 this
+        /// property has no effect, and frameless windows will not have rounded corners.
         /// </summary>
         [<Erase>]
         member val roundedCorners: bool = Unchecked.defaultof<_> with get, set
         #endif
 
-
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
         /// <summary>
-        /// Use <c>WS_THICKFRAME</c> style for frameless windows on Windows, which adds standard window frame. Setting it to <c>false</c> will remove window
-        /// shadow and window animations. Default is <c>true</c>.
+        /// <para>⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌</para>
+        /// Use <c>WS_THICKFRAME</c> style for frameless windows on Windows, which adds the standard window frame. Setting it to <c>false</c> will remove
+        /// window shadow and window animations, and disable window resizing via dragging the window edges. Default is <c>true</c>.
         /// </summary>
         [<Erase>]
         member val thickFrame: bool = Unchecked.defaultof<_> with get, set
+        #endif
+
         #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC
         /// <summary>
         /// <para>⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌</para>
@@ -6007,6 +6583,18 @@ module Enums =
                 | [<CompiledName("user-gesture-required")>] UserGestureRequired
                 | [<CompiledName("document-user-activation-required")>] DocumentUserActivationRequired
 
+            module Offscreen =
+                [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
+                type SharedTexturePixelFormat =
+                    /// <summary>
+                    /// The requested output texture format is 8-bit unorm RGBA, with SRGB SDR color space.
+                    /// </summary>
+                    | [<CompiledName("argb")>] Argb
+                    /// <summary>
+                    /// The requested output texture format is 16-bit float RGBA, with scRGB HDR color space.
+                    /// </summary>
+                    | [<CompiledName("rgbaf16")>] Rgbaf16
+
             [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
             type ImageAnimationPolicy =
                 | [<CompiledName("animate")>] Animate
@@ -6029,6 +6617,26 @@ module Enums =
                 | [<CompiledName("record-continuously")>] RecordContinuously
                 | [<CompiledName("record-as-much-as-possible")>] RecordAsMuchAsPossible
                 | [<CompiledName("trace-to-console")>] TraceToConsole
+
+        module SharedTextureImportTextureInfo =
+            [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
+            type PixelFormat =
+                /// <summary>
+                /// 32bpp BGRA (byte-order), 1 plane.
+                /// </summary>
+                | [<CompiledName("bgra")>] Bgra
+                /// <summary>
+                /// 32bpp RGBA (byte-order), 1 plane.
+                /// </summary>
+                | [<CompiledName("rgba")>] Rgba
+                /// <summary>
+                /// Half float RGBA, 1 plane.
+                /// </summary>
+                | [<CompiledName("rgbaf16")>] Rgbaf16
+                /// <summary>
+                /// 12bpp with Y plane followed by a 2x2 interleaved UV plane.
+                /// </summary>
+                | [<CompiledName("nv12")>] Nv12
 
         module ResolvedEndpoint =
             [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
@@ -6077,6 +6685,10 @@ module Enums =
                 /// Windows code integrity checks failed
                 /// </summary>
                 | [<CompiledName("integrity-failure")>] IntegrityFailure
+                /// <summary>
+                /// Process proactively terminated to prevent a future out-of-memory (OOM) situation
+                /// </summary>
+                | [<CompiledName("memory-eviction")>] MemoryEviction
 
         module Referrer =
             [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
@@ -6169,8 +6781,18 @@ module Enums =
             module TextureInfo =
                 [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
                 type PixelFormat =
+                    /// <summary>
+                    /// The texture format is 8-bit unorm RGBA.
+                    /// </summary>
                     | [<CompiledName("rgba")>] Rgba
+                    /// <summary>
+                    /// The texture format is 8-bit unorm BGRA.
+                    /// </summary>
                     | [<CompiledName("bgra")>] Bgra
+                    /// <summary>
+                    /// The texture format is 16-bit float RGBA.
+                    /// </summary>
+                    | [<CompiledName("rgbaf16")>] Rgbaf16
 
                 [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
                 type WidgetType =
@@ -6406,6 +7028,247 @@ module Enums =
                 | [<CompiledName("no_restriction")>] NoRestriction
                 | [<CompiledName("lax")>] Lax
                 | [<CompiledName("strict")>] Strict
+
+        module ColorSpace =
+            [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
+            type Range =
+                /// <summary>
+                /// Limited color range (RGB values ranging from 16 to 235)
+                /// </summary>
+                | [<CompiledName("limited")>] Limited
+                /// <summary>
+                /// Full color range (RGB values from 0 to 255)
+                /// </summary>
+                | [<CompiledName("full")>] Full
+                /// <summary>
+                /// Range defined by the transfer function and matrix
+                /// </summary>
+                | [<CompiledName("derived")>] Derived
+                /// <summary>
+                /// Invalid range
+                /// </summary>
+                | [<CompiledName("invalid")>] Invalid
+
+            [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
+            type Matrix =
+                /// <summary>
+                /// RGB matrix
+                /// </summary>
+                | [<CompiledName("rgb")>] Rgb
+                /// <summary>
+                /// BT709 matrix
+                /// </summary>
+                | [<CompiledName("bt709")>] Bt709
+                /// <summary>
+                /// FCC matrix
+                /// </summary>
+                | [<CompiledName("fcc")>] Fcc
+                /// <summary>
+                /// BT470BG matrix
+                /// </summary>
+                | [<CompiledName("bt470bg")>] Bt470bg
+                /// <summary>
+                /// SMPTE170M matrix
+                /// </summary>
+                | [<CompiledName("smpte170m")>] Smpte170m
+                /// <summary>
+                /// SMPTE240M matrix
+                /// </summary>
+                | [<CompiledName("smpte240m")>] Smpte240m
+                /// <summary>
+                /// YCoCg matrix
+                /// </summary>
+                | [<CompiledName("ycocg")>] Ycocg
+                /// <summary>
+                /// BT2020 NCL matrix
+                /// </summary>
+                | [<CompiledName("bt2020-ncl")>] Bt2020Ncl
+                /// <summary>
+                /// YDzDx matrix
+                /// </summary>
+                | [<CompiledName("ydzdx")>] Ydzdx
+                /// <summary>
+                /// GBR matrix
+                /// </summary>
+                | [<CompiledName("gbr")>] Gbr
+                /// <summary>
+                /// Invalid matrix
+                /// </summary>
+                | [<CompiledName("invalid")>] Invalid
+
+            [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
+            type Transfer =
+                /// <summary>
+                /// BT709 transfer function
+                /// </summary>
+                | [<CompiledName("bt709")>] Bt709
+                /// <summary>
+                /// BT709 Apple transfer function
+                /// </summary>
+                | [<CompiledName("bt709-apple")>] Bt709Apple
+                /// <summary>
+                /// Gamma 1.8 transfer function
+                /// </summary>
+                | [<CompiledName("gamma18")>] Gamma18
+                /// <summary>
+                /// Gamma 2.2 transfer function
+                /// </summary>
+                | [<CompiledName("gamma22")>] Gamma22
+                /// <summary>
+                /// Gamma 2.4 transfer function
+                /// </summary>
+                | [<CompiledName("gamma24")>] Gamma24
+                /// <summary>
+                /// Gamma 2.8 transfer function
+                /// </summary>
+                | [<CompiledName("gamma28")>] Gamma28
+                /// <summary>
+                /// SMPTE170M transfer function
+                /// </summary>
+                | [<CompiledName("smpte170m")>] Smpte170m
+                /// <summary>
+                /// SMPTE240M transfer function
+                /// </summary>
+                | [<CompiledName("smpte240m")>] Smpte240m
+                /// <summary>
+                /// Linear transfer function
+                /// </summary>
+                | [<CompiledName("linear")>] Linear
+                /// <summary>
+                /// Log transfer function
+                /// </summary>
+                | [<CompiledName("log")>] Log
+                /// <summary>
+                /// Log Square Root transfer function
+                /// </summary>
+                | [<CompiledName("log-sqrt")>] LogSqrt
+                /// <summary>
+                /// IEC61966-2-4 transfer function
+                /// </summary>
+                | [<CompiledName("iec61966-2-4")>] Iec6196624
+                /// <summary>
+                /// BT1361 ECG transfer function
+                /// </summary>
+                | [<CompiledName("bt1361-ecg")>] Bt1361Ecg
+                /// <summary>
+                /// sRGB transfer function
+                /// </summary>
+                | [<CompiledName("srgb")>] Srgb
+                /// <summary>
+                /// BT2020-10 transfer function
+                /// </summary>
+                | [<CompiledName("bt2020-10")>] Bt202010
+                /// <summary>
+                /// BT2020-12 transfer function
+                /// </summary>
+                | [<CompiledName("bt2020-12")>] Bt202012
+                /// <summary>
+                /// PQ (Perceptual Quantizer) transfer function
+                /// </summary>
+                | [<CompiledName("pq")>] Pq
+                /// <summary>
+                /// SMPTEST428-1 transfer function
+                /// </summary>
+                | [<CompiledName("smptest428-1")>] Smptest4281
+                /// <summary>
+                /// HLG (Hybrid Log-Gamma) transfer function
+                /// </summary>
+                | [<CompiledName("hlg")>] Hlg
+                /// <summary>
+                /// sRGB HDR transfer function
+                /// </summary>
+                | [<CompiledName("srgb-hdr")>] SrgbHdr
+                /// <summary>
+                /// Linear HDR transfer function
+                /// </summary>
+                | [<CompiledName("linear-hdr")>] LinearHdr
+                /// <summary>
+                /// Custom transfer function
+                /// </summary>
+                | [<CompiledName("custom")>] Custom
+                /// <summary>
+                /// Custom HDR transfer function
+                /// </summary>
+                | [<CompiledName("custom-hdr")>] CustomHdr
+                /// <summary>
+                /// scRGB Linear 80 nits transfer function
+                /// </summary>
+                | [<CompiledName("scrgb-linear-80-nits")>] ScrgbLinear80Nits
+                /// <summary>
+                /// Invalid transfer function
+                /// </summary>
+                | [<CompiledName("invalid")>] Invalid
+
+            [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
+            type Primaries =
+                /// <summary>
+                /// BT709 primaries (also used for sRGB)
+                /// </summary>
+                | [<CompiledName("bt709")>] Bt709
+                /// <summary>
+                /// BT470M primaries
+                /// </summary>
+                | [<CompiledName("bt470m")>] Bt470m
+                /// <summary>
+                /// BT470BG primaries
+                /// </summary>
+                | [<CompiledName("bt470bg")>] Bt470bg
+                /// <summary>
+                /// SMPTE170M primaries
+                /// </summary>
+                | [<CompiledName("smpte170m")>] Smpte170m
+                /// <summary>
+                /// SMPTE240M primaries
+                /// </summary>
+                | [<CompiledName("smpte240m")>] Smpte240m
+                /// <summary>
+                /// Film primaries
+                /// </summary>
+                | [<CompiledName("film")>] Film
+                /// <summary>
+                /// BT2020 primaries
+                /// </summary>
+                | [<CompiledName("bt2020")>] Bt2020
+                /// <summary>
+                /// SMPTEST428-1 primaries
+                /// </summary>
+                | [<CompiledName("smptest428-1")>] Smptest4281
+                /// <summary>
+                /// SMPTEST431-2 primaries
+                /// </summary>
+                | [<CompiledName("smptest431-2")>] Smptest4312
+                /// <summary>
+                /// P3 primaries
+                /// </summary>
+                | [<CompiledName("p3")>] P3
+                /// <summary>
+                /// XYZ D50 primaries
+                /// </summary>
+                | [<CompiledName("xyz-d50")>] XyzD50
+                /// <summary>
+                /// Adobe RGB primaries
+                /// </summary>
+                | [<CompiledName("adobe-rgb")>] AdobeRgb
+                /// <summary>
+                /// Apple Generic RGB primaries
+                /// </summary>
+                | [<CompiledName("apple-generic-rgb")>] AppleGenericRgb
+                /// <summary>
+                /// Wide Gamut Color Spin primaries
+                /// </summary>
+                | [<CompiledName("wide-gamut-color-spin")>] WideGamutColorSpin
+                /// <summary>
+                /// EBU 3213-E primaries
+                /// </summary>
+                | [<CompiledName("ebu-3213-e")>] Ebu3213E
+                /// <summary>
+                /// Custom primaries
+                /// </summary>
+                | [<CompiledName("custom")>] Custom
+                /// <summary>
+                /// Invalid primaries
+                /// </summary>
+                | [<CompiledName("invalid")>] Invalid
 
         module BrowserWindowConstructorOptions =
             [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
@@ -8354,7 +9217,7 @@ module Renderer =
             type Info
                 /// <param name="securityOrigin">Security origin for the isolated world.</param>
                 /// <param name="csp">Content Security Policy for the isolated world.</param>
-                /// <param name="name">Name for isolated world. Useful in devtools.</param>
+                /// <param name="name">Name for isolated world. Useful in DevTools.</param>
                 (?securityOrigin: string, ?csp: string, ?name: string) =
                 class
                 end
@@ -8372,7 +9235,7 @@ module Renderer =
                 member val csp: string = Unchecked.defaultof<_> with get, set
 
                 /// <summary>
-                /// Name for isolated world. Useful in devtools.
+                /// Name for isolated world. Useful in DevTools.
                 /// </summary>
                 [<Erase>]
                 member val name: string = Unchecked.defaultof<_> with get, set
@@ -8417,6 +9280,79 @@ module Renderer =
                 /// <param name="words"></param>
                 /// <param name="callback"></param>
                 type SpellCheck = delegate of words: string[] * callback: (string[] -> unit) -> unit
+
+    module SharedTexture =
+        module SendSharedTexture =
+            [<JS.Pojo>]
+            type Options
+                /// <param name="frame">The target frame to transfer the shared texture to. For <c>WebContents</c>, you can pass <c>webContents.mainFrame</c>. If you provide a
+                /// <c>webFrameMain</c> that is not a main frame, you'll need to enable <c>webPreferences.nodeIntegrationInSubFrames</c> for this, since this feature requires IPC between
+                /// main and the frame.</param>
+                /// <param name="importedSharedTexture">The imported shared texture.</param>
+                (frame: Main.WebFrameMain, importedSharedTexture: SharedTextureImported) =
+                class
+                end
+
+                /// <summary>
+                /// The target frame to transfer the shared texture to. For <c>WebContents</c>, you can pass <c>webContents.mainFrame</c>. If you provide a <c>webFrameMain</c>
+                /// that is not a main frame, you'll need to enable <c>webPreferences.nodeIntegrationInSubFrames</c> for this, since this feature requires IPC between main
+                /// and the frame.
+                /// </summary>
+                [<Erase>]
+                member val frame: Main.WebFrameMain = Unchecked.defaultof<_> with get, set
+
+                /// <summary>
+                /// The imported shared texture.
+                /// </summary>
+                [<Erase>]
+                member val importedSharedTexture: SharedTextureImported = Unchecked.defaultof<_> with get, set
+
+        module ImportSharedTexture =
+            [<JS.Pojo>]
+            type Options
+                /// <param name="textureInfo">The information of the shared texture to import.</param>
+                /// <param name="allReferencesReleased">Called when all references in all processes are released. You should keep the imported texture valid until this callback
+                /// is called.</param>
+                (textureInfo: SharedTextureImportTextureInfo, ?allReferencesReleased: unit -> unit) =
+                class
+                end
+
+                /// <summary>
+                /// The information of the shared texture to import.
+                /// </summary>
+                [<Erase>]
+                member val textureInfo: SharedTextureImportTextureInfo = Unchecked.defaultof<_> with get, set
+
+                /// <summary>
+                /// Called when all references in all processes are released. You should keep the imported texture valid until this callback is
+                /// called.
+                /// </summary>
+                [<Erase>]
+                member val allReferencesReleased: unit -> unit = Unchecked.defaultof<_> with get, set
+
+        module SetSharedTextureReceiver =
+            module Callback =
+                [<JS.Pojo>]
+                type ReceivedSharedTextureData
+                    /// <param name="importedSharedTexture">The imported shared texture.</param>
+                    (importedSharedTexture: SharedTextureImported) =
+                    class
+                    end
+
+                    /// <summary>
+                    /// The imported shared texture.
+                    /// </summary>
+                    [<Erase>]
+                    member val importedSharedTexture: SharedTextureImported = Unchecked.defaultof<_> with get, set
+
+            /// <param name="receivedSharedTextureData">The data received from the main process.</param>
+            /// <param name="...args">Additional arguments passed from the main process.</param>
+            type Callback =
+                delegate of
+                    receivedSharedTextureData:
+                        Renderer.SharedTexture.SetSharedTextureReceiver.Callback.ReceivedSharedTextureData *
+                    [<System.ParamArray>] args: obj[] ->
+                        Promise<unit>
 
     module IpcRenderer =
         module RemoveListener =
@@ -10526,7 +11462,7 @@ module Renderer =
         /// can provide any integer here.</param>
         /// <param name="securityOrigin">Security origin for the isolated world.</param>
         /// <param name="csp">Content Security Policy for the isolated world.</param>
-        /// <param name="name">Name for isolated world. Useful in devtools.</param>
+        /// <param name="name">Name for isolated world. Useful in DevTools.</param>
         [<Erase; ParamObject(1)>]
         static member inline setIsolatedWorldInfo
             (worldId: int, ?securityOrigin: string, ?csp: string, ?name: string)
@@ -10839,7 +11775,9 @@ module Renderer =
 
         /// <summary>
         /// Resolves when the operation has been completed. Rejects if there was an error while deleting the requested item.<br/><br/>This moves a
-        /// path to the OS-specific trash location (Trash on macOS, Recycle Bin on Windows, and a desktop-environment-specific location on Linux).
+        /// path to the OS-specific trash location (Trash on macOS, Recycle Bin on Windows, and a desktop-environment-specific location on Linux).<br/><br/>The path
+        /// must use the default path separator for the platform (backslash on Windows). Use <c>path.resolve()</c> from the <c>node:path</c> module to ensure
+        /// correct handling on all filesystems.
         /// </summary>
         /// <param name="path">path to the item to be moved to the trash.</param>
         [<Erase>]
@@ -10882,6 +11820,63 @@ module Renderer =
         static member inline readShortcutLink(shortcutPath: string) : ShortcutDetails = Unchecked.defaultof<_>
         #endif
 
+
+    /// <summary>
+    /// <para>⚠ Process Availability: Main ✔ | Renderer ✔ | Utility ❌ | Exported ✔</para>
+    /// &gt; Import shared textures into Electron and converts platform specific handles into <c>VideoFrame</c>. Supports all Web rendering systems, and can
+    /// be transferred across Electron processes. Read here for more information.<br/><br/>Process: Main, Renderer
+    /// </summary>
+    [<Import("sharedTexture", "electron")>]
+    type sharedTexture private () =
+        class
+        end
+
+        /// <summary>
+        /// Imports the shared texture from the given options.<br/><br/>&gt; [!NOTE] This method is only available in the main process.<br/><br/>The imported shared
+        /// texture.
+        /// </summary>
+        /// <param name="textureInfo">The information of the shared texture to import.</param>
+        /// <param name="allReferencesReleased">Called when all references in all processes are released. You should keep the imported texture valid until this callback
+        /// is called.</param>
+        [<Erase; ParamObject(0); Experimental("Experimental according to Electron")>]
+        static member inline importSharedTexture
+            (textureInfo: SharedTextureImportTextureInfo, ?allReferencesReleased: unit -> unit)
+            : SharedTextureImported =
+            Unchecked.defaultof<_>
+
+        /// <summary>
+        /// Send the imported shared texture to a renderer process. You must register a receiver at renderer process before calling this
+        /// method. This method has a 1000ms timeout. Ensure the receiver is set and the renderer process is alive before calling
+        /// this method.<br/><br/>&gt; [!NOTE] This method is only available in the main process.<br/><br/>Resolves when the transfer is complete.
+        /// </summary>
+        /// <param name="options">Options for sending shared texture.</param>
+        /// <param name="...args">Additional arguments to pass to the renderer process.</param>
+        [<Erase; Experimental("Experimental according to Electron")>]
+        static member inline sendSharedTexture
+            (options: Renderer.SharedTexture.SendSharedTexture.Options, ``...args``: obj[])
+            : Promise<unit> =
+            Unchecked.defaultof<_>
+
+        /// <summary>
+        /// Set a callback to receive imported shared textures from the main process.<br/><br/>&gt; [!NOTE] This method is only available in the
+        /// renderer process.
+        /// </summary>
+        /// <param name="callback">The function to receive the imported shared texture.</param>
+        [<Erase; Experimental("Experimental according to Electron")>]
+        static member inline setSharedTextureReceiver
+            (
+                callback:
+                    Renderer.SharedTexture.SetSharedTextureReceiver.Callback.ReceivedSharedTextureData
+                        * obj[]
+                        -> Promise<unit>
+            ) : unit =
+            Unchecked.defaultof<_>
+
+        /// <summary>
+        /// A <c>SharedTextureSubtle</c> property, provides subtle APIs for interacting with shared texture for advanced users.
+        /// </summary>
+        [<Erase; Experimental("Experimental according to Electron")>]
+        static member val subtle: SharedTextureSubtle = Unchecked.defaultof<_> with get, set
 
     /// <summary>
     /// <para>⚠ Process Availability: Main ✔ | Renderer ✔ | Utility ❌ | Exported ✔</para>
@@ -11036,8 +12031,8 @@ module Renderer =
         static member val noAsar: bool = Unchecked.defaultof<_> with get, set
 
         /// <summary>
-        /// A <c>boolean</c> that controls whether or not deprecation warnings are printed to <c>stderr</c>. Setting this to <c>true</c> will silence deprecation
-        /// warnings. This property is used instead of the <c>--no-deprecation</c> command line flag.
+        /// A <c>boolean</c> (optional) that controls whether or not deprecation warnings are printed to <c>stderr</c>. Setting this to <c>true</c> will silence
+        /// deprecation warnings. This property is used instead of the <c>--no-deprecation</c> command line flag.
         /// </summary>
         [<Erase>]
         static member val noDeprecation: bool = Unchecked.defaultof<_> with get, set
@@ -11102,8 +12097,8 @@ module Renderer =
         static member val electron: string = Unchecked.defaultof<_> with get
 
         /// <summary>
-        /// A <c>boolean</c>. If the app is running as a Windows Store app (appx), this property is <c>true</c>, for otherwise it
-        /// is <c>undefined</c>.
+        /// A <c>boolean</c>. If the app is running as an MSIX package (including AppX for Windows Store), this property is <c>true</c>,
+        /// otherwise it is <c>undefined</c>.
         /// </summary>
         [<Erase>]
         static member val windowsStore: bool = Unchecked.defaultof<_> with get
@@ -11364,16 +12359,17 @@ module Renderer =
         /// <para>
         /// ⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌
         /// </para>
-        /// Creates a new <c>NativeImage</c> instance from the <c>NSImage</c> that maps to the given image name. See Apple's <c>NSImageName</c> documentation for
-        /// a list of possible values.<br/><br/>The <c>hslShift</c> is applied to the image with the following rules:<br/><br/>* <c>hsl_shift[0]</c> (hue): The absolute hue
-        /// value for the image - 0 and 1 map to 0 and 360 on the hue color wheel (red).<br/>* <c>hsl_shift[1]</c>
-        /// (saturation): A saturation shift for the image, with the following key values: 0 = remove all color. 0.5 = leave
-        /// unchanged. 1 = fully saturate the image.<br/>* <c>hsl_shift[2]</c> (lightness): A lightness shift for the image, with the following key values:
-        /// 0 = remove all lightness (make all pixels black). 0.5 = leave unchanged. 1 = full lightness (make all pixels
-        /// white).<br/><br/>This means that <c>[-1, 0, 1]</c> will make the image completely white and <c>[-1, 1, 0]</c> will make the image
-        /// completely black.<br/><br/>In some cases, the <c>NSImageName</c> doesn't match its string representation; one example of this is <c>NSFolderImageName</c>, whose string representation
-        /// would actually be <c>NSFolder</c>. Therefore, you'll need to determine the correct string representation for your image before passing it in.
-        /// This can be done with the following:<br/><br/>where <c>SYSTEM_IMAGE_NAME</c> should be replaced with any value from this list.
+        /// Creates a new <c>NativeImage</c> instance from the <c>NSImage</c> that maps to the given image name. See Apple's <c>NSImageName</c> documentation and
+        /// SF Symbols for a list of possible values.<br/><br/>The <c>hslShift</c> is applied to the image with the following rules:<br/><br/>* <c>hsl_shift[0]</c> (hue):
+        /// The absolute hue value for the image - 0 and 1 map to 0 and 360 on the hue color
+        /// wheel (red).<br/>* <c>hsl_shift[1]</c> (saturation): A saturation shift for the image, with the following key values: 0 = remove all color.
+        /// 0.5 = leave unchanged. 1 = fully saturate the image.<br/>* <c>hsl_shift[2]</c> (lightness): A lightness shift for the image, with the
+        /// following key values: 0 = remove all lightness (make all pixels black). 0.5 = leave unchanged. 1 = full lightness
+        /// (make all pixels white).<br/><br/>This means that <c>[-1, 0, 1]</c> will make the image completely white and <c>[-1, 1, 0]</c> will
+        /// make the image completely black.<br/><br/>In some cases, the <c>NSImageName</c> doesn't match its string representation; one example of this is <c>NSFolderImageName</c>,
+        /// whose string representation would actually be <c>NSFolder</c>. Therefore, you'll need to determine the correct string representation for your image before
+        /// passing it in. This can be done with the following:<br/><br/>where <c>SYSTEM_IMAGE_NAME</c> should be replaced with any value from this list.<br/><br/>For
+        /// SF Symbols, usage looks as follows:<br/><br/>where <c>'square.and.pencil'</c> is the symbol name from the SF Symbols app.
         /// </summary>
         /// <param name="imageName"></param>
         /// <param name="hslShift"></param>
@@ -11683,10 +12679,10 @@ module Renderer =
 
     /// <summary>
     /// <para>⚠ Process Availability: Main ✔ | Renderer ✔ | Utility ❌ | Exported ✔</para>
-    /// &gt; Perform copy and paste operations on the system clipboard.<br/><br/>Process: Main, Renderer (non-sandboxed only)<br/><br/>&gt; [!IMPORTANT] If you want to call
-    /// this API from a renderer process with context isolation enabled, place the API call in your preload script and expose
-    /// it using the <c>contextBridge</c> API.<br/><br/>On Linux, there is also a <c>selection</c> clipboard. To manipulate it you need to pass <c>selection</c>
-    /// to each method:
+    /// &gt; Perform copy and paste operations on the system clipboard.<br/><br/>Process: Main, Renderer _Deprecated_ (non-sandboxed only)<br/><br/>&gt; [!NOTE] Using the <c>clipoard</c> API
+    /// from the renderer process is deprecated.<br/><br/>&gt; [!IMPORTANT] If you want to call this API from a renderer process, place the
+    /// API call in your preload script and expose it using the <c>contextBridge</c> API.<br/><br/>On Linux, there is also a <c>selection</c> clipboard.
+    /// To manipulate it you need to pass <c>selection</c> to each method:
     /// </summary>
     [<Import("clipboard", "electron")>]
     type clipboard =
@@ -11991,9 +12987,9 @@ module Utility =
                     Unchecked.defaultof<_> with get, set
 
     module SystemPreferences =
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
-        /// <para>⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌</para>
+        /// <para>⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌</para>
         /// </summary>
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never);
           AllowNullLiteral;
@@ -12134,6 +13130,9 @@ module Utility =
             /// <param name="session">The <c>Session</c> instance with which the request is associated.</param>
             /// <param name="partition">The name of the <c>partition</c> with which the request is associated. Defaults to the empty string. The <c>session</c> option
             /// supersedes <c>partition</c>. Thus if a <c>session</c> is explicitly specified, <c>partition</c> is ignored.</param>
+            /// <param name="bypassCustomProtocolHandlers">When set to <c>true</c>, custom protocol handlers registered for the request's URL scheme will not be called. This allows
+            /// forwarding an intercepted request to the built-in handler. webRequest handlers will still be triggered when bypassing custom protocols. Defaults to
+            /// <c>false</c>.</param>
             /// <param name="credentials">Can be <c>include</c>, <c>omit</c> or <c>same-origin</c>. Whether to send credentials with this request. If set to <c>include</c>, credentials from
             /// the session associated with the request will be used. If set to <c>omit</c>, credentials will not be sent with the
             /// request (and the <c>'login'</c> event will not be triggered in the event of a 401). If set to <c>same-origin</c>, <c>origin</c>
@@ -12160,6 +13159,7 @@ module Utility =
                 ?headers: Record<string, U2<string, string[]>>,
                 ?session: Main.Session,
                 ?partition: string,
+                ?bypassCustomProtocolHandlers: bool,
                 ?credentials: Utility.Enums.ClientRequest.Options.Credentials,
                 ?useSessionCookies: bool,
                 ?protocol: Utility.Enums.ClientRequest.Options.Protocol,
@@ -12207,6 +13207,13 @@ module Utility =
             /// </summary>
             [<Erase>]
             member val partition: string = Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// When set to <c>true</c>, custom protocol handlers registered for the request's URL scheme will not be called. This allows forwarding
+            /// an intercepted request to the built-in handler. webRequest handlers will still be triggered when bypassing custom protocols. Defaults to <c>false</c>.
+            /// </summary>
+            [<Erase>]
+            member val bypassCustomProtocolHandlers: bool = Unchecked.defaultof<_> with get, set
 
             /// <summary>
             /// Can be <c>include</c>, <c>omit</c> or <c>same-origin</c>. Whether to send credentials with this request. If set to <c>include</c>, credentials from the
@@ -12895,20 +13902,20 @@ module Utility =
         end
 
         interface EventEmitter
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌
         /// </para>
         /// </summary>
         [<Emit("$0.on('accent-color-changed', $1)"); Import("systemPreferences", "electron")>]
         static member inline onAccentColorChanged(handler: Event -> string -> unit) : unit = Unchecked.defaultof<_>
         #endif
 
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌
         /// </para>
         /// </summary>
         [<Emit("$0.on('accent-color-changed', $1)"); Import("systemPreferences", "electron")>]
@@ -12918,20 +13925,20 @@ module Utility =
             Unchecked.defaultof<_>
         #endif
 
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌
         /// </para>
         /// </summary>
         [<Emit("$0.once('accent-color-changed', $1)"); Import("systemPreferences", "electron")>]
         static member inline onceAccentColorChanged(handler: Event -> string -> unit) : unit = Unchecked.defaultof<_>
         #endif
 
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌
         /// </para>
         /// </summary>
         [<Emit("$0.once('accent-color-changed', $1)"); Import("systemPreferences", "electron")>]
@@ -12941,20 +13948,20 @@ module Utility =
             Unchecked.defaultof<_>
         #endif
 
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌
         /// </para>
         /// </summary>
         [<Emit("$0.off('accent-color-changed', $1)"); Import("systemPreferences", "electron")>]
         static member inline offAccentColorChanged(handler: Event -> string -> unit) : unit = Unchecked.defaultof<_>
         #endif
 
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌
         /// </para>
         /// </summary>
         [<Emit("$0.off('accent-color-changed', $1)"); Import("systemPreferences", "electron")>]
@@ -13201,18 +14208,13 @@ module Utility =
         static member inline removeUserDefault(key: string) : unit = Unchecked.defaultof<_>
         #endif
 
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC || ELECTRON_OS_WIN
+
         /// <summary>
-        /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ✔ | LIN ❌ | MAS ❌
-        /// </para>
         /// The users current system wide accent color preference in RGBA hexadecimal form.<br/><br/>This API is only available on macOS 10.14 Mojave
         /// or newer.
         /// </summary>
         [<Erase>]
         static member inline getAccentColor() : string = Unchecked.defaultof<_>
-        #endif
-
         #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
@@ -14367,7 +15369,7 @@ module Main =
             abstract member sessionId: string with get, set
 
         /// <summary>
-        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or devtools is invoked for the
+        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or DevTools is invoked for the
         /// attached <c>webContents</c>.
         /// </summary>
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never);
@@ -16274,14 +17276,14 @@ module Main =
             [<JS.Pojo>]
             type Options
                 /// <param name="allowFileAccess">Whether to allow the extension to read local files over <c>file://</c> protocol and inject content scripts into <c>file://</c> pages.
-                /// This is required e.g. for loading devtools extensions on <c>file://</c> URLs. Defaults to false.</param>
+                /// This is required e.g. for loading DevTools extensions on <c>file://</c> URLs. Defaults to false.</param>
                 (allowFileAccess: bool) =
                 class
                 end
 
                 /// <summary>
                 /// Whether to allow the extension to read local files over <c>file://</c> protocol and inject content scripts into <c>file://</c> pages. This
-                /// is required e.g. for loading devtools extensions on <c>file://</c> URLs. Defaults to false.
+                /// is required e.g. for loading DevTools extensions on <c>file://</c> URLs. Defaults to false.
                 /// </summary>
                 [<Erase>]
                 member val allowFileAccess: bool = Unchecked.defaultof<_> with get, set
@@ -17469,7 +18471,7 @@ module Main =
 
     module AutoUpdater =
         /// <summary>
-        /// Emitted when an update has been downloaded.<br/><br/>On Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
+        /// Emitted when an update has been downloaded.<br/><br/>With Squirrel.Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
         /// this event. A successfully downloaded update will still be applied the next time the application starts.
         /// </summary>
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never);
@@ -17494,10 +18496,13 @@ module Main =
         module SetFeedURL =
             [<JS.Pojo>]
             type Options
-                /// <param name="url"></param>
+                /// <param name="url">The update server URL. For _Windows_ MSIX, this can be either a direct link to an MSIX file (e.g.,
+                /// <c>https://example.com/update.msix</c>) or a JSON endpoint that returns update information (see the Squirrel.Mac README for more information).</param>
                 /// <param name="headers">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || HTTP request headers.</param>
                 /// <param name="serverType">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || Can be <c>json</c> or
                 /// <c>default</c>, see the Squirrel.Mac README for more information.</param>
+                /// <param name="allowAnyVersion">⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌ || If <c>true</c>, allows downgrades
+                /// to older versions for MSIX packages. Defaults to <c>false</c>.</param>
                 (
                     url: string
                     #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC
@@ -17508,11 +18513,19 @@ module Main =
                     ,
                     ?serverType: Main.Enums.AutoUpdater.SetFeedURL.Options.ServerType
                     #endif
+                    #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+                    ,
+                    ?allowAnyVersion: bool
+                    #endif
 
                 ) =
                 class
                 end
 
+                /// <summary>
+                /// The update server URL. For _Windows_ MSIX, this can be either a direct link to an MSIX file (e.g., <c>https://example.com/update.msix</c>)
+                /// or a JSON endpoint that returns update information (see the Squirrel.Mac README for more information).
+                /// </summary>
                 [<Erase>]
                 member val url: string = Unchecked.defaultof<_> with get, set
                 #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC
@@ -17532,6 +18545,15 @@ module Main =
                 [<Erase>]
                 member val serverType: Main.Enums.AutoUpdater.SetFeedURL.Options.ServerType =
                     Unchecked.defaultof<_> with get, set
+                #endif
+
+                #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+                /// <summary>
+                /// <para>⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌</para>
+                /// If <c>true</c>, allows downgrades to older versions for MSIX packages. Defaults to <c>false</c>.
+                /// </summary>
+                [<Erase>]
+                member val allowAnyVersion: bool = Unchecked.defaultof<_> with get, set
                 #endif
 
 
@@ -19790,23 +20812,23 @@ module Main =
         module OpenDevTools =
             [<JS.Pojo>]
             type Options
-                /// <param name="mode">Opens the devtools with specified dock state, can be <c>left</c>, <c>right</c>, <c>bottom</c>, <c>undocked</c>, <c>detach</c>. Defaults to last used dock
+                /// <param name="mode">Opens the DevTools with specified dock state, can be <c>left</c>, <c>right</c>, <c>bottom</c>, <c>undocked</c>, <c>detach</c>. Defaults to last used dock
                 /// state. In <c>undocked</c> mode it's possible to dock back. In <c>detach</c> mode it's not.</param>
-                /// <param name="activate">Whether to bring the opened devtools window to the foreground. The default is <c>true</c>.</param>
+                /// <param name="activate">Whether to bring the opened DevTools window to the foreground. The default is <c>true</c>.</param>
                 /// <param name="title">A title for the DevTools window (only in <c>undocked</c> or <c>detach</c> mode).</param>
                 (mode: Main.Enums.WebContents.OpenDevTools.Options.Mode, ?activate: bool, ?title: string) =
                 class
                 end
 
                 /// <summary>
-                /// Opens the devtools with specified dock state, can be <c>left</c>, <c>right</c>, <c>bottom</c>, <c>undocked</c>, <c>detach</c>. Defaults to last used dock state.
+                /// Opens the DevTools with specified dock state, can be <c>left</c>, <c>right</c>, <c>bottom</c>, <c>undocked</c>, <c>detach</c>. Defaults to last used dock state.
                 /// In <c>undocked</c> mode it's possible to dock back. In <c>detach</c> mode it's not.
                 /// </summary>
                 [<Erase>]
                 member val mode: Main.Enums.WebContents.OpenDevTools.Options.Mode = Unchecked.defaultof<_> with get, set
 
                 /// <summary>
-                /// Whether to bring the opened devtools window to the foreground. The default is <c>true</c>.
+                /// Whether to bring the opened DevTools window to the foreground. The default is <c>true</c>.
                 /// </summary>
                 [<Erase>]
                 member val activate: bool = Unchecked.defaultof<_> with get, set
@@ -20536,9 +21558,9 @@ module Main =
             type Change = delegate of selectedIndex: int * isSelected: bool -> unit
 
     module SystemPreferences =
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
-        /// <para>⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌</para>
+        /// <para>⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌</para>
         /// </summary>
         [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never);
           AllowNullLiteral;
@@ -20601,6 +21623,79 @@ module Main =
             /// <param name="userInfo"></param>
             /// <param name="object"></param>
             type Callback = delegate of event: string * userInfo: Record<string, obj> * object: string -> unit
+
+    module SharedTexture =
+        module SendSharedTexture =
+            [<JS.Pojo>]
+            type Options
+                /// <param name="frame">The target frame to transfer the shared texture to. For <c>WebContents</c>, you can pass <c>webContents.mainFrame</c>. If you provide a
+                /// <c>webFrameMain</c> that is not a main frame, you'll need to enable <c>webPreferences.nodeIntegrationInSubFrames</c> for this, since this feature requires IPC between
+                /// main and the frame.</param>
+                /// <param name="importedSharedTexture">The imported shared texture.</param>
+                (frame: Main.WebFrameMain, importedSharedTexture: SharedTextureImported) =
+                class
+                end
+
+                /// <summary>
+                /// The target frame to transfer the shared texture to. For <c>WebContents</c>, you can pass <c>webContents.mainFrame</c>. If you provide a <c>webFrameMain</c>
+                /// that is not a main frame, you'll need to enable <c>webPreferences.nodeIntegrationInSubFrames</c> for this, since this feature requires IPC between main
+                /// and the frame.
+                /// </summary>
+                [<Erase>]
+                member val frame: Main.WebFrameMain = Unchecked.defaultof<_> with get, set
+
+                /// <summary>
+                /// The imported shared texture.
+                /// </summary>
+                [<Erase>]
+                member val importedSharedTexture: SharedTextureImported = Unchecked.defaultof<_> with get, set
+
+        module ImportSharedTexture =
+            [<JS.Pojo>]
+            type Options
+                /// <param name="textureInfo">The information of the shared texture to import.</param>
+                /// <param name="allReferencesReleased">Called when all references in all processes are released. You should keep the imported texture valid until this callback
+                /// is called.</param>
+                (textureInfo: SharedTextureImportTextureInfo, ?allReferencesReleased: unit -> unit) =
+                class
+                end
+
+                /// <summary>
+                /// The information of the shared texture to import.
+                /// </summary>
+                [<Erase>]
+                member val textureInfo: SharedTextureImportTextureInfo = Unchecked.defaultof<_> with get, set
+
+                /// <summary>
+                /// Called when all references in all processes are released. You should keep the imported texture valid until this callback is
+                /// called.
+                /// </summary>
+                [<Erase>]
+                member val allReferencesReleased: unit -> unit = Unchecked.defaultof<_> with get, set
+
+        module SetSharedTextureReceiver =
+            module Callback =
+                [<JS.Pojo>]
+                type ReceivedSharedTextureData
+                    /// <param name="importedSharedTexture">The imported shared texture.</param>
+                    (importedSharedTexture: SharedTextureImported) =
+                    class
+                    end
+
+                    /// <summary>
+                    /// The imported shared texture.
+                    /// </summary>
+                    [<Erase>]
+                    member val importedSharedTexture: SharedTextureImported = Unchecked.defaultof<_> with get, set
+
+            /// <param name="receivedSharedTextureData">The data received from the main process.</param>
+            /// <param name="...args">Additional arguments passed from the main process.</param>
+            type Callback =
+                delegate of
+                    receivedSharedTextureData:
+                        Main.SharedTexture.SetSharedTextureReceiver.Callback.ReceivedSharedTextureData *
+                    [<System.ParamArray>] args: obj[] ->
+                        Promise<unit>
 
     module Session =
         /// <summary>
@@ -21180,14 +22275,14 @@ module Main =
             [<JS.Pojo>]
             type Options
                 /// <param name="allowFileAccess">Whether to allow the extension to read local files over <c>file://</c> protocol and inject content scripts into <c>file://</c> pages.
-                /// This is required e.g. for loading devtools extensions on <c>file://</c> URLs. Defaults to false.</param>
+                /// This is required e.g. for loading DevTools extensions on <c>file://</c> URLs. Defaults to false.</param>
                 (allowFileAccess: bool) =
                 class
                 end
 
                 /// <summary>
                 /// Whether to allow the extension to read local files over <c>file://</c> protocol and inject content scripts into <c>file://</c> pages. This
-                /// is required e.g. for loading devtools extensions on <c>file://</c> URLs. Defaults to false.
+                /// is required e.g. for loading DevTools extensions on <c>file://</c> URLs. Defaults to false.
                 /// </summary>
                 [<Erase>]
                 member val allowFileAccess: bool = Unchecked.defaultof<_> with get, set
@@ -22061,7 +23156,7 @@ module Main =
             /// <param name="toolTip">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || Hover text for this
             /// menu item.</param>
             /// <param name="accelerator">An Accelerator string.</param>
-            /// <param name="icon"></param>
+            /// <param name="icon">Can be a NativeImage or the file path of an icon.</param>
             /// <param name="enabled">If false, the menu item will be greyed out and unclickable.</param>
             /// <param name="acceleratorWorksWhenHidden">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || default is <c>true</c>, and
             /// when <c>false</c> will prevent the accelerator from triggering the item if the item is not visible.</param>
@@ -22173,6 +23268,9 @@ module Main =
             [<Erase>]
             member val accelerator: string = Unchecked.defaultof<_> with get, set
 
+            /// <summary>
+            /// Can be a NativeImage or the file path of an icon.
+            /// </summary>
             [<Erase>]
             member val icon: U2<Main.NativeImage, string> = Unchecked.defaultof<_> with get, set
 
@@ -22413,6 +23511,9 @@ module Main =
             /// <param name="session">The <c>Session</c> instance with which the request is associated.</param>
             /// <param name="partition">The name of the <c>partition</c> with which the request is associated. Defaults to the empty string. The <c>session</c> option
             /// supersedes <c>partition</c>. Thus if a <c>session</c> is explicitly specified, <c>partition</c> is ignored.</param>
+            /// <param name="bypassCustomProtocolHandlers">When set to <c>true</c>, custom protocol handlers registered for the request's URL scheme will not be called. This allows
+            /// forwarding an intercepted request to the built-in handler. webRequest handlers will still be triggered when bypassing custom protocols. Defaults to
+            /// <c>false</c>.</param>
             /// <param name="credentials">Can be <c>include</c>, <c>omit</c> or <c>same-origin</c>. Whether to send credentials with this request. If set to <c>include</c>, credentials from
             /// the session associated with the request will be used. If set to <c>omit</c>, credentials will not be sent with the
             /// request (and the <c>'login'</c> event will not be triggered in the event of a 401). If set to <c>same-origin</c>, <c>origin</c>
@@ -22439,6 +23540,7 @@ module Main =
                 ?headers: Record<string, U2<string, string[]>>,
                 ?session: Main.Session,
                 ?partition: string,
+                ?bypassCustomProtocolHandlers: bool,
                 ?credentials: Main.Enums.ClientRequest.Options.Credentials,
                 ?useSessionCookies: bool,
                 ?protocol: Main.Enums.ClientRequest.Options.Protocol,
@@ -22486,6 +23588,13 @@ module Main =
             /// </summary>
             [<Erase>]
             member val partition: string = Unchecked.defaultof<_> with get, set
+
+            /// <summary>
+            /// When set to <c>true</c>, custom protocol handlers registered for the request's URL scheme will not be called. This allows forwarding
+            /// an intercepted request to the built-in handler. webRequest handlers will still be triggered when bypassing custom protocols. Defaults to <c>false</c>.
+            /// </summary>
+            [<Erase>]
+            member val bypassCustomProtocolHandlers: bool = Unchecked.defaultof<_> with get, set
 
             /// <summary>
             /// Can be <c>include</c>, <c>omit</c> or <c>same-origin</c>. Whether to send credentials with this request. If set to <c>include</c>, credentials from the
@@ -26880,6 +27989,10 @@ module Main =
                         /// Windows code integrity checks failed
                         /// </summary>
                         | [<CompiledName("integrity-failure")>] IntegrityFailure
+                        /// <summary>
+                        /// Process proactively terminated to prevent a future out-of-memory (OOM) situation
+                        /// </summary>
+                        | [<CompiledName("memory-eviction")>] MemoryEviction
 
                     [<StringEnum(CaseRules.None); RequireQualifiedAccess>]
                     type Type =
@@ -29288,19 +30401,19 @@ module Main =
         member inline _.offPaint(handler: Main.WebContents.IOnPaint -> unit) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when the devtools window instructs the webContents to reload
+        /// Emitted when the DevTools window instructs the webContents to reload
         /// </summary>
         [<Emit("$0.on('devtools-reload-page', $1)")>]
         member inline _.onDevtoolsReloadPage(handler: unit -> unit) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when the devtools window instructs the webContents to reload
+        /// Emitted when the DevTools window instructs the webContents to reload
         /// </summary>
         [<Emit("$0.once('devtools-reload-page', $1)")>]
         member inline _.onceDevtoolsReloadPage(handler: unit -> unit) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when the devtools window instructs the webContents to reload
+        /// Emitted when the DevTools window instructs the webContents to reload
         /// </summary>
         [<Emit("$0.off('devtools-reload-page', $1)")>]
         member inline _.offDevtoolsReloadPage(handler: unit -> unit) : unit = Unchecked.defaultof<_>
@@ -29662,9 +30775,10 @@ module Main =
 
         /// <summary>
         /// the promise will resolve when the page has finished loading (see <c>did-finish-load</c>), and rejects if the page fails to load
-        /// (see <c>did-fail-load</c>). A noop rejection handler is already attached, which avoids unhandled rejection errors.<br/><br/>Loads the <c>url</c> in the window. The
-        /// <c>url</c> must contain the protocol prefix, e.g. the <c>http://</c> or <c>file://</c>. If the load should bypass http cache then use
-        /// the <c>pragma</c> header to achieve it.
+        /// (see <c>did-fail-load</c>). A noop rejection handler is already attached, which avoids unhandled rejection errors. If the existing page has a
+        /// beforeUnload handler, <c>did-fail-load</c> will be called unless <c>will-prevent-unload</c> is handled.<br/><br/>Loads the <c>url</c> in the window. The <c>url</c> must contain the
+        /// protocol prefix, e.g. the <c>http://</c> or <c>file://</c>. If the load should bypass http cache then use the <c>pragma</c> header to
+        /// achieve it.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="httpReferrer">An HTTP Referrer url.</param>
@@ -30211,25 +31325,24 @@ module Main =
         member inline _.removeWorkSpace(path: string) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Uses the <c>devToolsWebContents</c> as the target <c>WebContents</c> to show devtools.<br/><br/>The <c>devToolsWebContents</c> must not have done any navigation, and it should
-        /// not be used for other purposes after the call.<br/><br/>By default Electron manages the devtools by creating an internal <c>WebContents</c> with
+        /// Uses the <c>devToolsWebContents</c> as the target <c>WebContents</c> to show DevTools.<br/><br/>The <c>devToolsWebContents</c> must not have done any navigation, and it should
+        /// not be used for other purposes after the call.<br/><br/>By default, Electron manages the DevTools by creating an internal <c>WebContents</c> with
         /// native view, which developers have very limited control of. With the <c>setDevToolsWebContents</c> method, developers can use any <c>WebContents</c> to show
-        /// the devtools in it, including <c>BrowserWindow</c>, <c>BrowserView</c> and <c>&lt;webview&gt;</c> tag.<br/><br/>Note that closing the devtools does not destroy the <c>devToolsWebContents</c>, it
-        /// is caller's responsibility to destroy <c>devToolsWebContents</c>.<br/><br/>An example of showing devtools in a <c>&lt;webview&gt;</c> tag:<br/><br/>An example of showing devtools in a
-        /// <c>BrowserWindow</c>:
+        /// the DevTools in it, such as <c>BrowserWindow</c> or <c>WebContentsView</c>.<br/><br/>Note that closing the DevTools does not destroy the <c>devToolsWebContents</c>, it is
+        /// the caller's responsibility to destroy <c>devToolsWebContents</c> manually.<br/><br/>An example of showing DevTools in a <c>BrowserWindow</c>:
         /// </summary>
         /// <param name="devToolsWebContents"></param>
         [<Erase>]
         member inline _.setDevToolsWebContents(devToolsWebContents: Main.WebContents) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Opens the devtools.<br/><br/>When <c>contents</c> is a <c>&lt;webview&gt;</c> tag, the <c>mode</c> would be <c>detach</c> by default, explicitly passing an empty <c>mode</c>
-        /// can force using last used dock state.<br/><br/>On Windows, if Windows Control Overlay is enabled, Devtools will be opened with <c>mode:
+        /// Opens the DevTools.<br/><br/>When <c>contents</c> is a <c>&lt;webview&gt;</c> tag, the <c>mode</c> would be <c>detach</c> by default, explicitly passing an empty <c>mode</c>
+        /// can force using last used dock state.<br/><br/>On Windows, if Windows Control Overlay is enabled, DevTools will be opened with <c>mode:
         /// 'detach'</c>.
         /// </summary>
-        /// <param name="mode">Opens the devtools with specified dock state, can be <c>left</c>, <c>right</c>, <c>bottom</c>, <c>undocked</c>, <c>detach</c>. Defaults to last used dock
+        /// <param name="mode">Opens the DevTools with specified dock state, can be <c>left</c>, <c>right</c>, <c>bottom</c>, <c>undocked</c>, <c>detach</c>. Defaults to last used dock
         /// state. In <c>undocked</c> mode it's possible to dock back. In <c>detach</c> mode it's not.</param>
-        /// <param name="activate">Whether to bring the opened devtools window to the foreground. The default is <c>true</c>.</param>
+        /// <param name="activate">Whether to bring the opened DevTools window to the foreground. The default is <c>true</c>.</param>
         /// <param name="title">A title for the DevTools window (only in <c>undocked</c> or <c>detach</c> mode).</param>
         [<Erase; ParamObject(0)>]
         member inline _.openDevTools
@@ -30238,19 +31351,19 @@ module Main =
             Unchecked.defaultof<_>
 
         /// <summary>
-        /// Closes the devtools.
+        /// Closes the DevTools view.
         /// </summary>
         [<Erase>]
         member inline _.closeDevTools() : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Whether the devtools is opened.
+        /// Whether the DevTools view is opened.
         /// </summary>
         [<Erase>]
         member inline _.isDevToolsOpened() : bool = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Whether the devtools view is focused .
+        /// Whether the DevTools view is focused .
         /// </summary>
         [<Erase>]
         member inline _.isDevToolsFocused() : bool = Unchecked.defaultof<_>
@@ -30643,10 +31756,10 @@ module Main =
         member val navigationHistory: Main.NavigationHistory = Unchecked.defaultof<_> with get
 
         /// <summary>
-        /// A <c>WebContents</c> instance that might own this <c>WebContents</c>.
+        /// A <c>WebContents | null</c> property that represents a <c>WebContents</c> instance that might own this <c>WebContents</c>.
         /// </summary>
         [<Erase>]
-        member val hostWebContents: Main.WebContents = Unchecked.defaultof<_> with get
+        member val hostWebContents: Option<Main.WebContents> = Unchecked.defaultof<_> with get
 
         /// <summary>
         /// A <c>WebContents | null</c> property that represents the of DevTools <c>WebContents</c> associated with a given <c>WebContents</c>.<br/><br/>&gt; [!NOTE] Users should never
@@ -30709,7 +31822,7 @@ module Main =
         interface EventEmitter
 
         /// <summary>
-        /// An array of all <c>WebContents</c> instances. This will contain web contents for all windows, webviews, opened devtools, and devtools extension
+        /// An array of all <c>WebContents</c> instances. This will contain web contents for all windows, webviews, opened DevTools, and DevTools extension
         /// background pages.
         /// </summary>
         [<Erase>]
@@ -32715,20 +33828,20 @@ module Main =
         end
 
         interface EventEmitter
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌
         /// </para>
         /// </summary>
         [<Emit("$0.on('accent-color-changed', $1)"); Import("systemPreferences", "electron")>]
         static member inline onAccentColorChanged(handler: Event -> string -> unit) : unit = Unchecked.defaultof<_>
         #endif
 
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌
         /// </para>
         /// </summary>
         [<Emit("$0.on('accent-color-changed', $1)"); Import("systemPreferences", "electron")>]
@@ -32738,20 +33851,20 @@ module Main =
             Unchecked.defaultof<_>
         #endif
 
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌
         /// </para>
         /// </summary>
         [<Emit("$0.once('accent-color-changed', $1)"); Import("systemPreferences", "electron")>]
         static member inline onceAccentColorChanged(handler: Event -> string -> unit) : unit = Unchecked.defaultof<_>
         #endif
 
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌
         /// </para>
         /// </summary>
         [<Emit("$0.once('accent-color-changed', $1)"); Import("systemPreferences", "electron")>]
@@ -32761,20 +33874,20 @@ module Main =
             Unchecked.defaultof<_>
         #endif
 
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌
         /// </para>
         /// </summary>
         [<Emit("$0.off('accent-color-changed', $1)"); Import("systemPreferences", "electron")>]
         static member inline offAccentColorChanged(handler: Event -> string -> unit) : unit = Unchecked.defaultof<_>
         #endif
 
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_LIN || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ✔ | MAS ❌
         /// </para>
         /// </summary>
         [<Emit("$0.off('accent-color-changed', $1)"); Import("systemPreferences", "electron")>]
@@ -33021,18 +34134,13 @@ module Main =
         static member inline removeUserDefault(key: string) : unit = Unchecked.defaultof<_>
         #endif
 
-        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC || ELECTRON_OS_WIN
+
         /// <summary>
-        /// <para>
-        /// ⚠ OS Compatibility: WIN ✔ | MAC ✔ | LIN ❌ | MAS ❌
-        /// </para>
         /// The users current system wide accent color preference in RGBA hexadecimal form.<br/><br/>This API is only available on macOS 10.14 Mojave
         /// or newer.
         /// </summary>
         [<Erase>]
         static member inline getAccentColor() : string = Unchecked.defaultof<_>
-        #endif
-
         #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC || ELECTRON_OS_WIN
         /// <summary>
         /// <para>
@@ -33228,7 +34336,9 @@ module Main =
 
         /// <summary>
         /// Resolves when the operation has been completed. Rejects if there was an error while deleting the requested item.<br/><br/>This moves a
-        /// path to the OS-specific trash location (Trash on macOS, Recycle Bin on Windows, and a desktop-environment-specific location on Linux).
+        /// path to the OS-specific trash location (Trash on macOS, Recycle Bin on Windows, and a desktop-environment-specific location on Linux).<br/><br/>The path
+        /// must use the default path separator for the platform (backslash on Windows). Use <c>path.resolve()</c> from the <c>node:path</c> module to ensure
+        /// correct handling on all filesystems.
         /// </summary>
         /// <param name="path">path to the item to be moved to the trash.</param>
         [<Erase>]
@@ -33268,6 +34378,63 @@ module Main =
         static member inline readShortcutLink(shortcutPath: string) : ShortcutDetails = Unchecked.defaultof<_>
         #endif
 
+
+    /// <summary>
+    /// <para>⚠ Process Availability: Main ✔ | Renderer ✔ | Utility ❌ | Exported ✔</para>
+    /// &gt; Import shared textures into Electron and converts platform specific handles into <c>VideoFrame</c>. Supports all Web rendering systems, and can
+    /// be transferred across Electron processes. Read here for more information.<br/><br/>Process: Main, Renderer
+    /// </summary>
+    [<Import("sharedTexture", "electron")>]
+    type sharedTexture private () =
+        class
+        end
+
+        /// <summary>
+        /// Imports the shared texture from the given options.<br/><br/>&gt; [!NOTE] This method is only available in the main process.<br/><br/>The imported shared
+        /// texture.
+        /// </summary>
+        /// <param name="textureInfo">The information of the shared texture to import.</param>
+        /// <param name="allReferencesReleased">Called when all references in all processes are released. You should keep the imported texture valid until this callback
+        /// is called.</param>
+        [<Erase; ParamObject(0); Experimental("Experimental according to Electron")>]
+        static member inline importSharedTexture
+            (textureInfo: SharedTextureImportTextureInfo, ?allReferencesReleased: unit -> unit)
+            : SharedTextureImported =
+            Unchecked.defaultof<_>
+
+        /// <summary>
+        /// Send the imported shared texture to a renderer process. You must register a receiver at renderer process before calling this
+        /// method. This method has a 1000ms timeout. Ensure the receiver is set and the renderer process is alive before calling
+        /// this method.<br/><br/>&gt; [!NOTE] This method is only available in the main process.<br/><br/>Resolves when the transfer is complete.
+        /// </summary>
+        /// <param name="options">Options for sending shared texture.</param>
+        /// <param name="...args">Additional arguments to pass to the renderer process.</param>
+        [<Erase; Experimental("Experimental according to Electron")>]
+        static member inline sendSharedTexture
+            (options: Main.SharedTexture.SendSharedTexture.Options, ``...args``: obj[])
+            : Promise<unit> =
+            Unchecked.defaultof<_>
+
+        /// <summary>
+        /// Set a callback to receive imported shared textures from the main process.<br/><br/>&gt; [!NOTE] This method is only available in the
+        /// renderer process.
+        /// </summary>
+        /// <param name="callback">The function to receive the imported shared texture.</param>
+        [<Erase; Experimental("Experimental according to Electron")>]
+        static member inline setSharedTextureReceiver
+            (
+                callback:
+                    Main.SharedTexture.SetSharedTextureReceiver.Callback.ReceivedSharedTextureData
+                        * obj[]
+                        -> Promise<unit>
+            ) : unit =
+            Unchecked.defaultof<_>
+
+        /// <summary>
+        /// A <c>SharedTextureSubtle</c> property, provides subtle APIs for interacting with shared texture for advanced users.
+        /// </summary>
+        [<Erase; Experimental("Experimental according to Electron")>]
+        static member val subtle: SharedTextureSubtle = Unchecked.defaultof<_> with get, set
 
     /// <summary>
     /// <para>⚠ Process Availability: Main ✔ | Renderer ❌ | Utility ❌ | Exported ✔</para>
@@ -35127,7 +36294,7 @@ module Main =
             Unchecked.defaultof<_>
 
         /// <summary>
-        /// A <c>Session</c> object, the default session object of the app.
+        /// A <c>Session</c> object, the default session object of the app, available after <c>app.whenReady</c> is called.
         /// </summary>
         [<Erase>]
         static member val defaultSession: Main.Session = Unchecked.defaultof<_> with get, set
@@ -36154,8 +37321,8 @@ module Main =
         static member val noAsar: bool = Unchecked.defaultof<_> with get, set
 
         /// <summary>
-        /// A <c>boolean</c> that controls whether or not deprecation warnings are printed to <c>stderr</c>. Setting this to <c>true</c> will silence deprecation
-        /// warnings. This property is used instead of the <c>--no-deprecation</c> command line flag.
+        /// A <c>boolean</c> (optional) that controls whether or not deprecation warnings are printed to <c>stderr</c>. Setting this to <c>true</c> will silence
+        /// deprecation warnings. This property is used instead of the <c>--no-deprecation</c> command line flag.
         /// </summary>
         [<Erase>]
         static member val noDeprecation: bool = Unchecked.defaultof<_> with get, set
@@ -36220,8 +37387,8 @@ module Main =
         static member val electron: string = Unchecked.defaultof<_> with get
 
         /// <summary>
-        /// A <c>boolean</c>. If the app is running as a Windows Store app (appx), this property is <c>true</c>, for otherwise it
-        /// is <c>undefined</c>.
+        /// A <c>boolean</c>. If the app is running as an MSIX package (including AppX for Windows Store), this property is <c>true</c>,
+        /// otherwise it is <c>undefined</c>.
         /// </summary>
         [<Erase>]
         static member val windowsStore: bool = Unchecked.defaultof<_> with get
@@ -37399,11 +38566,11 @@ module Main =
         /// A <c>string</c> property that can be <c>system</c>, <c>light</c> or <c>dark</c>.  It is used to override and supersede the value
         /// that Chromium has chosen to use internally.<br/><br/>Setting this property to <c>system</c> will remove the override and everything will be reset
         /// to the OS default.  By default <c>themeSource</c> is <c>system</c>.<br/><br/>Settings this property to <c>dark</c> will have the following effects:<br/><br/>* <c>nativeTheme.shouldUseDarkColors</c>
-        /// will be <c>true</c> when accessed<br/>* Any UI Electron renders on Linux and Windows including context menus, devtools, etc. will use
+        /// will be <c>true</c> when accessed<br/>* Any UI Electron renders on Linux and Windows including context menus, DevTools, etc. will use
         /// the dark UI.<br/>* Any UI the OS renders on macOS including menus, window frames, etc. will use the dark UI.<br/>*
         /// The <c>prefers-color-scheme</c> CSS query will match <c>dark</c> mode.<br/>* The <c>updated</c> event will be emitted<br/><br/>Settings this property to <c>light</c> will have
         /// the following effects:<br/><br/>* <c>nativeTheme.shouldUseDarkColors</c> will be <c>false</c> when accessed<br/>* Any UI Electron renders on Linux and Windows including context menus,
-        /// devtools, etc. will use the light UI.<br/>* Any UI the OS renders on macOS including menus, window frames, etc. will
+        /// DevTools, etc. will use the light UI.<br/>* Any UI the OS renders on macOS including menus, window frames, etc. will
         /// use the light UI.<br/>* The <c>prefers-color-scheme</c> CSS query will match <c>light</c> mode.<br/>* The <c>updated</c> event will be emitted<br/><br/>The usage of
         /// this property should align with a classic "dark mode" state machine in your application where the user has three options.<br/><br/>*
         /// <c>Follow OS</c> --&gt; <c>themeSource = 'system'</c><br/>* <c>Dark Mode</c> --&gt; <c>themeSource = 'dark'</c><br/>* <c>Light Mode</c> --&gt; <c>themeSource = 'light'</c><br/><br/>Your application should
@@ -37702,16 +38869,17 @@ module Main =
         /// <para>
         /// ⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌
         /// </para>
-        /// Creates a new <c>NativeImage</c> instance from the <c>NSImage</c> that maps to the given image name. See Apple's <c>NSImageName</c> documentation for
-        /// a list of possible values.<br/><br/>The <c>hslShift</c> is applied to the image with the following rules:<br/><br/>* <c>hsl_shift[0]</c> (hue): The absolute hue
-        /// value for the image - 0 and 1 map to 0 and 360 on the hue color wheel (red).<br/>* <c>hsl_shift[1]</c>
-        /// (saturation): A saturation shift for the image, with the following key values: 0 = remove all color. 0.5 = leave
-        /// unchanged. 1 = fully saturate the image.<br/>* <c>hsl_shift[2]</c> (lightness): A lightness shift for the image, with the following key values:
-        /// 0 = remove all lightness (make all pixels black). 0.5 = leave unchanged. 1 = full lightness (make all pixels
-        /// white).<br/><br/>This means that <c>[-1, 0, 1]</c> will make the image completely white and <c>[-1, 1, 0]</c> will make the image
-        /// completely black.<br/><br/>In some cases, the <c>NSImageName</c> doesn't match its string representation; one example of this is <c>NSFolderImageName</c>, whose string representation
-        /// would actually be <c>NSFolder</c>. Therefore, you'll need to determine the correct string representation for your image before passing it in.
-        /// This can be done with the following:<br/><br/>where <c>SYSTEM_IMAGE_NAME</c> should be replaced with any value from this list.
+        /// Creates a new <c>NativeImage</c> instance from the <c>NSImage</c> that maps to the given image name. See Apple's <c>NSImageName</c> documentation and
+        /// SF Symbols for a list of possible values.<br/><br/>The <c>hslShift</c> is applied to the image with the following rules:<br/><br/>* <c>hsl_shift[0]</c> (hue):
+        /// The absolute hue value for the image - 0 and 1 map to 0 and 360 on the hue color
+        /// wheel (red).<br/>* <c>hsl_shift[1]</c> (saturation): A saturation shift for the image, with the following key values: 0 = remove all color.
+        /// 0.5 = leave unchanged. 1 = fully saturate the image.<br/>* <c>hsl_shift[2]</c> (lightness): A lightness shift for the image, with the
+        /// following key values: 0 = remove all lightness (make all pixels black). 0.5 = leave unchanged. 1 = full lightness
+        /// (make all pixels white).<br/><br/>This means that <c>[-1, 0, 1]</c> will make the image completely white and <c>[-1, 1, 0]</c> will
+        /// make the image completely black.<br/><br/>In some cases, the <c>NSImageName</c> doesn't match its string representation; one example of this is <c>NSFolderImageName</c>,
+        /// whose string representation would actually be <c>NSFolder</c>. Therefore, you'll need to determine the correct string representation for your image before
+        /// passing it in. This can be done with the following:<br/><br/>where <c>SYSTEM_IMAGE_NAME</c> should be replaced with any value from this list.<br/><br/>For
+        /// SF Symbols, usage looks as follows:<br/><br/>where <c>'square.and.pencil'</c> is the symbol name from the SF Symbols app.
         /// </summary>
         /// <param name="imageName"></param>
         /// <param name="hslShift"></param>
@@ -37987,7 +39155,7 @@ module Main =
         /// <param name="toolTip">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || Hover text for this
         /// menu item.</param>
         /// <param name="accelerator">An Accelerator string.</param>
-        /// <param name="icon"></param>
+        /// <param name="icon">Can be a NativeImage or the file path of an icon.</param>
         /// <param name="enabled">If false, the menu item will be greyed out and unclickable.</param>
         /// <param name="acceleratorWorksWhenHidden">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || default is <c>true</c>, and
         /// when <c>false</c> will prevent the accelerator from triggering the item if the item is not visible.</param>
@@ -39627,42 +40795,42 @@ module Main =
         interface EventEmitter
 
         /// <summary>
-        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or devtools is invoked for the
+        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or DevTools is invoked for the
         /// attached <c>webContents</c>.
         /// </summary>
         [<Emit("$0.on('detach', $1)")>]
         member inline _.onDetach(handler: Event -> string -> unit) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or devtools is invoked for the
+        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or DevTools is invoked for the
         /// attached <c>webContents</c>.
         /// </summary>
         [<Emit("$0.on('detach', $1)")>]
         member inline _.onDetach(handler: Main.Debugger.IOnDetach -> unit) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or devtools is invoked for the
+        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or DevTools is invoked for the
         /// attached <c>webContents</c>.
         /// </summary>
         [<Emit("$0.once('detach', $1)")>]
         member inline _.onceDetach(handler: Event -> string -> unit) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or devtools is invoked for the
+        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or DevTools is invoked for the
         /// attached <c>webContents</c>.
         /// </summary>
         [<Emit("$0.once('detach', $1)")>]
         member inline _.onceDetach(handler: Main.Debugger.IOnDetach -> unit) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or devtools is invoked for the
+        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or DevTools is invoked for the
         /// attached <c>webContents</c>.
         /// </summary>
         [<Emit("$0.off('detach', $1)")>]
         member inline _.offDetach(handler: Event -> string -> unit) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or devtools is invoked for the
+        /// Emitted when the debugging session is terminated. This happens either when <c>webContents</c> is closed or DevTools is invoked for the
         /// attached <c>webContents</c>.
         /// </summary>
         [<Emit("$0.off('detach', $1)")>]
@@ -40071,10 +41239,10 @@ module Main =
 
     /// <summary>
     /// <para>⚠ Process Availability: Main ✔ | Renderer ✔ | Utility ❌ | Exported ✔</para>
-    /// &gt; Perform copy and paste operations on the system clipboard.<br/><br/>Process: Main, Renderer (non-sandboxed only)<br/><br/>&gt; [!IMPORTANT] If you want to call
-    /// this API from a renderer process with context isolation enabled, place the API call in your preload script and expose
-    /// it using the <c>contextBridge</c> API.<br/><br/>On Linux, there is also a <c>selection</c> clipboard. To manipulate it you need to pass <c>selection</c>
-    /// to each method:
+    /// &gt; Perform copy and paste operations on the system clipboard.<br/><br/>Process: Main, Renderer _Deprecated_ (non-sandboxed only)<br/><br/>&gt; [!NOTE] Using the <c>clipoard</c> API
+    /// from the renderer process is deprecated.<br/><br/>&gt; [!IMPORTANT] If you want to call this API from a renderer process, place the
+    /// API call in your preload script and expose it using the <c>contextBridge</c> API.<br/><br/>On Linux, there is also a <c>selection</c> clipboard.
+    /// To manipulate it you need to pass <c>selection</c> to each method:
     /// </summary>
     [<Import("clipboard", "electron")>]
     type clipboard =
@@ -42013,7 +43181,8 @@ module Main =
         /// <summary>
         /// The <c>bounds</c> of the window as <c>Object</c>.<br/><br/>&gt; [!NOTE] On macOS, the y-coordinate value returned will be at minimum the Tray
         /// height. For example, calling <c>win.setBounds({ x: 25, y: 20, width: 800, height: 600 })</c> with a tray height of 38
-        /// means that <c>win.getBounds()</c> will return <c>{ x: 25, y: 38, width: 800, height: 600 }</c>.
+        /// means that <c>win.getBounds()</c> will return <c>{ x: 25, y: 38, width: 800, height: 600 }</c>.<br/><br/>&gt; [!NOTE] On Wayland, this method
+        /// will return <c>{ x: 0, y: 0, ... }</c> as introspecting or programmatically changing the global window coordinates is prohibited.
         /// </summary>
         [<Erase>]
         member inline _.getBounds() : Rectangle = Unchecked.defaultof<_>
@@ -42314,7 +43483,8 @@ module Main =
         member inline _.setPosition(x: int, y: int, ?animate: bool) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Contains the window's current position.
+        /// Contains the window's current position.<br/><br/>&gt; [!NOTE] On Wayland, this method will return <c>[0, 0]</c> as introspecting or programmatically changing the
+        /// global window coordinates is prohibited.
         /// </summary>
         [<Erase>]
         member inline _.getPosition() : int[] = Unchecked.defaultof<_>
@@ -42530,9 +43700,11 @@ module Main =
 
         /// <summary>
         /// the promise will resolve when the page has finished loading (see <c>did-finish-load</c>), and rejects if the page fails to load
-        /// (see <c>did-fail-load</c>).<br/><br/>Same as <c>webContents.loadURL(url[, options])</c>.<br/><br/>The <c>url</c> can be a remote address (e.g. <c>http://</c>) or a path to a local HTML
-        /// file using the <c>file://</c> protocol.<br/><br/>To ensure that file URLs are properly formatted, it is recommended to use Node's <c>url.format</c> method:<br/><br/>You
-        /// can load a URL using a <c>POST</c> request with URL-encoded data by doing the following:
+        /// (see <c>did-fail-load</c>). A noop rejection handler is already attached, which avoids unhandled rejection errors. If the existing page has a
+        /// beforeUnload handler, <c>did-fail-load</c> will be called unless <c>will-prevent-unload</c> is handled.<br/><br/>Same as <c>webContents.loadURL(url[, options])</c>.<br/><br/>The <c>url</c> can be a remote address (e.g.
+        /// <c>http://</c>) or a path to a local HTML file using the <c>file://</c> protocol.<br/><br/>To ensure that file URLs are properly formatted,
+        /// it is recommended to use Node's <c>url.format</c> method:<br/><br/>You can load a URL using a <c>POST</c> request with URL-encoded data by
+        /// doing the following:
         /// </summary>
         /// <param name="url"></param>
         /// <param name="httpReferrer">An HTTP Referrer URL.</param>
@@ -42765,13 +43937,16 @@ module Main =
         /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
         /// </para>
         /// Sets the system accent color and highlighting of active window border.<br/><br/>The <c>accentColor</c> parameter accepts the following values:<br/><br/>* <b>Color string</b> -
-        /// Sets a custom accent color using standard CSS color formats (Hex, RGB, RGBA, HSL, HSLA, or named colors). Alpha values
-        /// in RGBA/HSLA formats are ignored and the color is treated as fully opaque.<br/>* **<c>true</c>** - Uses the system's default accent
-        /// color from user preferences in System Settings.<br/>* **<c>false</c>** - Explicitly disables accent color highlighting for the window.<br/><br/>Examples:
+        /// Like <c>true</c>, but sets a custom accent color using standard CSS color formats (Hex, RGB, RGBA, HSL, HSLA, or named
+        /// colors). Alpha values in RGBA/HSLA formats are ignored and the color is treated as fully opaque.<br/>* **<c>true</c>** - Enable accent
+        /// color highlighting for the window with the system accent color regardless of whether accent colors are enabled for windows in
+        /// System <c>Settings.</c><br/>* **<c>false</c>** - Disable accent color highlighting for the window regardless of whether accent colors are currently enabled for
+        /// windows in System Settings.<br/>* **<c>null</c>** - Reset window accent color behavior to follow behavior set in System Settings.<br/><br/>Examples:
         /// </summary>
-        /// <param name="accentColor">The accent color for the window. By default, follows user preference in System Settings.</param>
+        /// <param name="accentColor">The accent color for the window. By default, follows user preference in System Settings. To reset to system default,
+        /// pass <c>null</c>.</param>
         [<Erase>]
-        member inline _.setAccentColor(accentColor: U2<bool, string>) : unit = Unchecked.defaultof<_>
+        member inline _.setAccentColor(accentColor: U3<bool, string, unit>) : unit = Unchecked.defaultof<_>
         #endif
 
         #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
@@ -44843,7 +46018,8 @@ module Main =
         /// <summary>
         /// The <c>bounds</c> of the window as <c>Object</c>.<br/><br/>&gt; [!NOTE] On macOS, the y-coordinate value returned will be at minimum the Tray
         /// height. For example, calling <c>win.setBounds({ x: 25, y: 20, width: 800, height: 600 })</c> with a tray height of 38
-        /// means that <c>win.getBounds()</c> will return <c>{ x: 25, y: 38, width: 800, height: 600 }</c>.
+        /// means that <c>win.getBounds()</c> will return <c>{ x: 25, y: 38, width: 800, height: 600 }</c>.<br/><br/>&gt; [!NOTE] On Wayland, this method
+        /// will return <c>{ x: 0, y: 0, ... }</c> as introspecting or programmatically changing the global window coordinates is prohibited.
         /// </summary>
         [<Erase>]
         member inline _.getBounds() : Rectangle = Unchecked.defaultof<_>
@@ -45144,7 +46320,8 @@ module Main =
         member inline _.setPosition(x: int, y: int, ?animate: bool) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Contains the window's current position.
+        /// Contains the window's current position.<br/><br/>&gt; [!NOTE] On Wayland, this method will return <c>[0, 0]</c> as introspecting or programmatically changing the
+        /// global window coordinates is prohibited.
         /// </summary>
         [<Erase>]
         member inline _.getPosition() : int[] = Unchecked.defaultof<_>
@@ -45526,13 +46703,16 @@ module Main =
         /// ⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌
         /// </para>
         /// Sets the system accent color and highlighting of active window border.<br/><br/>The <c>accentColor</c> parameter accepts the following values:<br/><br/>* <b>Color string</b> -
-        /// Sets a custom accent color using standard CSS color formats (Hex, RGB, RGBA, HSL, HSLA, or named colors). Alpha values
-        /// in RGBA/HSLA formats are ignored and the color is treated as fully opaque.<br/>* **<c>true</c>** - Uses the system's default accent
-        /// color from user preferences in System Settings.<br/>* **<c>false</c>** - Explicitly disables accent color highlighting for the window.<br/><br/>Examples:
+        /// Like <c>true</c>, but sets a custom accent color using standard CSS color formats (Hex, RGB, RGBA, HSL, HSLA, or named
+        /// colors). Alpha values in RGBA/HSLA formats are ignored and the color is treated as fully opaque.<br/>* **<c>true</c>** - Enable accent
+        /// color highlighting for the window with the system accent color regardless of whether accent colors are enabled for windows in
+        /// System <c>Settings.</c><br/>* **<c>false</c>** - Disable accent color highlighting for the window regardless of whether accent colors are currently enabled for
+        /// windows in System Settings.<br/>* **<c>null</c>** - Reset window accent color behavior to follow behavior set in System Settings.<br/><br/>Examples:
         /// </summary>
-        /// <param name="accentColor">The accent color for the window. By default, follows user preference in System Settings.</param>
+        /// <param name="accentColor">The accent color for the window. By default, follows user preference in System Settings. To reset to system default,
+        /// pass <c>null</c>.</param>
         [<Erase>]
-        member inline _.setAccentColor(accentColor: U2<bool, string>) : unit = Unchecked.defaultof<_>
+        member inline _.setAccentColor(accentColor: U3<bool, string, unit>) : unit = Unchecked.defaultof<_>
         #endif
 
         #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_WIN
@@ -46138,16 +47318,21 @@ module Main =
     /// to make it work. For server-side requirements, you can read Server Support. Note that App Transport Security (ATS) applies to
     /// all requests made as part of the update process. Apps that need to disable ATS can add the <c>NSAllowsArbitraryLoads</c> key
     /// to their app's plist.<br/><br/>&gt; [!IMPORTANT] Your application must be signed for automatic updates on macOS. This is a requirement of
-    /// <c>Squirrel.Mac</c>.<br/><br/>### Windows<br/><br/>On Windows, you have to install your app into a user's machine before you can use the <c>autoUpdater</c>, so
-    /// it is recommended that you use electron-winstaller or Electron Forge's Squirrel.Windows maker to generate a Windows installer.<br/><br/>Apps built with Squirrel.Windows
-    /// will trigger custom launch events that must be handled by your Electron application to ensure proper setup and teardown.<br/><br/>Squirrel.Windows apps
-    /// will launch with the <c>--squirrel-firstrun</c> argument immediately after installation. During this time, Squirrel.Windows will obtain a file lock on your
-    /// app, and <c>autoUpdater</c> requests will fail until the lock is released. In practice, this means that you won't be able
-    /// to check for updates on first launch for the first few seconds. You can work around this by not checking
-    /// for updates when <c>process.argv</c> contains the <c>--squirrel-firstrun</c> flag or by setting a 10-second timeout on your update checks (see electron/electron#7155
-    /// for more information).<br/><br/>The installer generated with Squirrel.Windows will create a shortcut icon with an Application User Model ID in the
-    /// format of <c>com.squirrel.PACKAGE_ID.YOUR_EXE_WITHOUT_DOT_EXE</c>, examples are <c>com.squirrel.slack.Slack</c> and <c>com.squirrel.code.Code</c>. You have to use the same ID for your app with <c>app.setAppUserModelId</c>
-    /// API, otherwise Windows will not be able to pin your app properly in task bar.
+    /// <c>Squirrel.Mac</c>.<br/><br/>### Windows<br/><br/>On Windows, the <c>autoUpdater</c> module automatically selects the appropriate update mechanism based on how your app is packaged:<br/><br/>* **MSIX
+    /// packages**: If your app is running as an MSIX package (created with electron-windows-msix and detected via <c>process.windowsStore</c>), the module uses
+    /// the MSIX updater, which supports direct MSIX file links and JSON update feeds.<br/>* **Squirrel.Windows**: For apps installed via traditional installers
+    /// (created with electron-winstaller or Electron Forge's Squirrel.Windows maker), the module uses Squirrel.Windows for updates.<br/><br/>You don't need to configure which updater
+    /// to use; Electron automatically detects the packaging format and uses the appropriate one.<br/><br/>### Squirrel.Windows<br/><br/>Apps built with Squirrel.Windows will trigger custom
+    /// launch events that must be handled by your Electron application to ensure proper setup and teardown.<br/><br/>Squirrel.Windows apps will launch with
+    /// the <c>--squirrel-firstrun</c> argument immediately after installation. During this time, Squirrel.Windows will obtain a file lock on your app, and <c>autoUpdater</c>
+    /// requests will fail until the lock is released. In practice, this means that you won't be able to check for
+    /// updates on first launch for the first few seconds. You can work around this by not checking for updates when
+    /// <c>process.argv</c> contains the <c>--squirrel-firstrun</c> flag or by setting a 10-second timeout on your update checks (see electron/electron#7155 for more information).<br/><br/>The
+    /// installer generated with Squirrel.Windows will create a shortcut icon with an Application User Model ID in the format of <c>com.squirrel.PACKAGE_ID.YOUR_EXE_WITHOUT_DOT_EXE</c>,
+    /// examples are <c>com.squirrel.slack.Slack</c> and <c>com.squirrel.code.Code</c>. You have to use the same ID for your app with <c>app.setAppUserModelId</c> API, otherwise Windows
+    /// will not be able to pin your app properly in task bar.<br/><br/>### MSIX Packages<br/><br/>When your app is packaged as an
+    /// MSIX, the <c>autoUpdater</c> module provides additional functionality:<br/><br/>* Use the <c>allowAnyVersion</c> option in <c>setFeedURL()</c> to allow updates to older versions (downgrades)<br/>*
+    /// Support for direct MSIX file links or JSON update feeds (similar to Squirrel.Mac format)
     /// </summary>
     [<Import("autoUpdater", "electron")>]
     type autoUpdater =
@@ -46229,7 +47414,7 @@ module Main =
         static member inline offUpdateNotAvailable(handler: unit -> unit) : unit = Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when an update has been downloaded.<br/><br/>On Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
+        /// Emitted when an update has been downloaded.<br/><br/>With Squirrel.Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
         /// this event. A successfully downloaded update will still be applied the next time the application starts.
         /// </summary>
         [<Emit("$0.on('update-downloaded', $1)"); Import("autoUpdater", "electron")>]
@@ -46239,7 +47424,7 @@ module Main =
             Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when an update has been downloaded.<br/><br/>On Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
+        /// Emitted when an update has been downloaded.<br/><br/>With Squirrel.Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
         /// this event. A successfully downloaded update will still be applied the next time the application starts.
         /// </summary>
         [<Emit("$0.on('update-downloaded', $1)"); Import("autoUpdater", "electron")>]
@@ -46247,7 +47432,7 @@ module Main =
             Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when an update has been downloaded.<br/><br/>On Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
+        /// Emitted when an update has been downloaded.<br/><br/>With Squirrel.Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
         /// this event. A successfully downloaded update will still be applied the next time the application starts.
         /// </summary>
         [<Emit("$0.once('update-downloaded', $1)"); Import("autoUpdater", "electron")>]
@@ -46257,7 +47442,7 @@ module Main =
             Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when an update has been downloaded.<br/><br/>On Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
+        /// Emitted when an update has been downloaded.<br/><br/>With Squirrel.Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
         /// this event. A successfully downloaded update will still be applied the next time the application starts.
         /// </summary>
         [<Emit("$0.once('update-downloaded', $1)"); Import("autoUpdater", "electron")>]
@@ -46265,7 +47450,7 @@ module Main =
             Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when an update has been downloaded.<br/><br/>On Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
+        /// Emitted when an update has been downloaded.<br/><br/>With Squirrel.Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
         /// this event. A successfully downloaded update will still be applied the next time the application starts.
         /// </summary>
         [<Emit("$0.off('update-downloaded', $1)"); Import("autoUpdater", "electron")>]
@@ -46275,7 +47460,7 @@ module Main =
             Unchecked.defaultof<_>
 
         /// <summary>
-        /// Emitted when an update has been downloaded.<br/><br/>On Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
+        /// Emitted when an update has been downloaded.<br/><br/>With Squirrel.Windows only <c>releaseName</c> is available.<br/><br/>&gt; [!NOTE] It is not strictly necessary to handle
         /// this event. A successfully downloaded update will still be applied the next time the application starts.
         /// </summary>
         [<Emit("$0.off('update-downloaded', $1)"); Import("autoUpdater", "electron")>]
@@ -46309,16 +47494,20 @@ module Main =
         /// <summary>
         /// Sets the <c>url</c> and initialize the auto updater.
         /// </summary>
-        /// <param name="url"></param>
+        /// <param name="url">The update server URL. For _Windows_ MSIX, this can be either a direct link to an MSIX file (e.g.,
+        /// <c>https://example.com/update.msix</c>) or a JSON endpoint that returns update information (see the Squirrel.Mac README for more information).</param>
         /// <param name="headers">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || HTTP request headers.</param>
         /// <param name="serverType">⚠ OS Compatibility: WIN ❌ | MAC ✔ | LIN ❌ | MAS ❌ || Can be <c>json</c> or
         /// <c>default</c>, see the Squirrel.Mac README for more information.</param>
+        /// <param name="allowAnyVersion">⚠ OS Compatibility: WIN ✔ | MAC ❌ | LIN ❌ | MAS ❌ || If <c>true</c>, allows downgrades
+        /// to older versions for MSIX packages. Defaults to <c>false</c>.</param>
         [<Erase; ParamObject(0)>]
         static member inline setFeedURL
             (
                 url: string,
                 ?headers: Record<string, string>,
-                ?serverType: Main.Enums.AutoUpdater.SetFeedURL.Options.ServerType
+                ?serverType: Main.Enums.AutoUpdater.SetFeedURL.Options.ServerType,
+                ?allowAnyVersion: bool
             ) : unit =
             Unchecked.defaultof<_>
 
@@ -48549,6 +49738,12 @@ module Main =
         static member inline disableHardwareAcceleration() : unit = Unchecked.defaultof<_>
 
         /// <summary>
+        /// whether hardware acceleration is currently enabled.<br/><br/>&gt; [!NOTE] This information is only usable after the <c>gpu-info-update</c> event is emitted.
+        /// </summary>
+        [<Erase>]
+        static member inline isHardwareAccelerationEnabled() : bool = Unchecked.defaultof<_>
+
+        /// <summary>
         /// By default, Chromium disables 3D APIs (e.g. WebGL) until restart on a per domain basis if the GPU processes crashes
         /// too frequently. This function disables that behavior.<br/><br/>This method can only be called before app is ready.
         /// </summary>
@@ -48571,7 +49766,8 @@ module Main =
         /// For <c>infoType</c> equal to <c>complete</c>: Promise is fulfilled with <c>Object</c> containing all the GPU Information as in chromium's GPUInfo object.
         /// This includes the version and driver information that's shown on <c>chrome://gpu</c> page.<br/><br/>For <c>infoType</c> equal to <c>basic</c>: Promise is fulfilled with
         /// <c>Object</c> containing fewer attributes than when requested with <c>complete</c>. Here's an example of basic response:<br/><br/>Using <c>basic</c> should be preferred if
-        /// only basic information like <c>vendorId</c> or <c>deviceId</c> is needed.
+        /// only basic information like <c>vendorId</c> or <c>deviceId</c> is needed.<br/><br/>Promise is rejected if the GPU is completely disabled, i.e. no hardware
+        /// and software implementations are available.
         /// </summary>
         /// <param name="infoType">Can be <c>basic</c> or <c>complete</c>.</param>
         [<Erase>]
@@ -48715,11 +49911,42 @@ module Main =
         /// </para>
         /// Manually enables Chrome's accessibility support, allowing to expose accessibility switch to users in application settings. See Chromium's accessibility docs for
         /// more details. Disabled by default.<br/><br/>This API must be called after the <c>ready</c> event is emitted.<br/><br/>&gt; [!NOTE] Rendering accessibility tree can
-        /// significantly affect the performance of your app. It should not be enabled by default.
+        /// significantly affect the performance of your app. It should not be enabled by default. Calling this method will enable the
+        /// following accessibility support features: <c>nativeAPIs</c>, <c>webContents</c>, <c>inlineTextBoxes</c>, and <c>extendedProperties</c>.
         /// </summary>
         /// <param name="enabled">Enable or disable accessibility tree rendering</param>
         [<Erase>]
         static member inline setAccessibilitySupportEnabled(enabled: bool) : unit = Unchecked.defaultof<_>
+        #endif
+
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC || ELECTRON_OS_WIN
+        /// <summary>
+        /// <para>
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ✔ | LIN ❌ | MAS ❌
+        /// </para>
+        /// Array of strings naming currently enabled accessibility support components. Possible values:<br/><br/>* <c>nativeAPIs</c> - Native OS accessibility APIs integration enabled.<br/>* <c>webContents</c>
+        /// - Web contents accessibility tree exposure enabled.<br/>* <c>inlineTextBoxes</c> - Inline text boxes (character bounding boxes) enabled.<br/>* <c>extendedProperties</c> - Extended accessibility
+        /// properties enabled.<br/>* <c>screenReader</c> - Screen reader specific mode enabled.<br/>* <c>html</c> - HTML accessibility tree construction enabled.<br/>* <c>labelImages</c> - Accessibility support
+        /// for automatic image annotations.<br/>* <c>pdfPrinting</c> - Accessibility support for PDF printing enabled.<br/><br/>Notes:<br/><br/>* The array may be empty if no accessibility
+        /// modes are active.<br/>* Use <c>app.isAccessibilitySupportEnabled()</c> for the legacy boolean check; prefer this method for granular diagnostics or telemetry.<br/><br/>Example:
+        /// </summary>
+        [<Erase>]
+        static member inline getAccessibilitySupportFeatures() : string[] = Unchecked.defaultof<_>
+        #endif
+
+        #if !(ELECTRON_OS_LIN || ELECTRON_OS_WIN || ELECTRON_OS_MAC || ELECTRON_OS_MAS) || ELECTRON_OS_MAC || ELECTRON_OS_WIN
+        /// <summary>
+        /// <para>
+        /// ⚠ OS Compatibility: WIN ✔ | MAC ✔ | LIN ❌ | MAS ❌
+        /// </para>
+        /// Possible values are:<br/><br/>* <c>nativeAPIs</c> - Native OS accessibility APIs integration enabled.<br/>* <c>webContents</c> - Web contents accessibility tree exposure enabled.<br/>* <c>inlineTextBoxes</c>
+        /// - Inline text boxes (character bounding boxes) enabled.<br/>* <c>extendedProperties</c> - Extended accessibility properties enabled.<br/>* <c>screenReader</c> - Screen reader specific mode
+        /// enabled.<br/>* <c>html</c> - HTML accessibility tree construction enabled.<br/>* <c>labelImages</c> - Accessibility support for automatic image annotations.<br/>* <c>pdfPrinting</c> - Accessibility support
+        /// for PDF printing enabled.<br/><br/>To disable all supported features, pass an empty array <c>[]</c>.<br/><br/>Example:
+        /// </summary>
+        /// <param name="features">An array of the accessibility features to enable.</param>
+        [<Erase>]
+        static member inline setAccessibilitySupportFeatures(features: string[]) : unit = Unchecked.defaultof<_>
         #endif
 
 
