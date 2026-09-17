@@ -14,111 +14,6 @@ open GitNet
 initializeContext ()
 
 
-// Laundry
-Target.create Ops.clean (ignore >> Laundry.clean)
-Target.create Ops.fableClean (ignore >> Laundry.fableClean)
-Target.create Ops.listReleases (fun _ -> Electron.listReleases true)
-Target.create Ops.listDetailedReleases (fun _ -> Electron.listReleases false)
-
-Target.create Ops.downloadApi
-<| fun _ ->
-    match Args.release with
-    | Some value ->
-        Electron.tryGetReleaseFromString value
-        |> Option.orElseWith (fun () -> failwith $"Could not download a release matching the input '{value}'")
-        |> Option.iter (fun releaseInfo ->
-            Status.setRelease releaseInfo
-            Electron.downloadRelease releaseInfo
-        )
-    | None -> failwithf $"Target %s{Ops.downloadApi} requires the argument '--release <RELEASE>' to be set"
-
-Target.create Ops.downloadInput
-<| fun _ ->
-    let getUserInput () =
-        let isQuit: string -> bool =
-            _.ToLowerInvariant()
-            >> function
-                | "q"
-                | "quit" -> true
-                | _ -> false
-
-        match UserInput.getUserInput "Choose a release or (q)uit:\n" with
-        | text when isQuit text -> failwith "User quit"
-        | text -> text
-
-    let rec run value =
-        match Electron.tryGetReleaseFromString value with
-        | None ->
-            Electron.listReleases true
-            getUserInput () |> run
-        | Some value ->
-            Status.setRelease value
-            Electron.downloadRelease value
-
-    Electron.listReleases true
-    getUserInput () |> run
-
-Target.create Ops.downloadLatest
-<| function
-    | _ when Args.downloadMinorOnly || Args.downloadPatchOnly ->
-        Target.runSimple Ops.loadCache [] |> ignore
-
-        let currentElectronVersion =
-            let tagName = Status.getCache().tagName.TrimStart('v')
-
-            tagName
-            |> tryParseSepochSemver
-            |> Option.map _.SemVer
-            |> function
-                | Some ver -> ver
-                | None ->
-                    failwith
-                        $"The `--only-minor` and `--only-patch` flags require the cache \
-                            to have a compatible semver. Found {tagName} instead."
-
-        let parseTagName =
-            _.tagName.TrimStart('v') >> tryParseSepochSemver >> Option.map _.SemVer
-
-        Electron.getReleases ()
-        |> List.filter (_.isPrerelease >> not)
-        |> List.filter (
-            parseTagName
-            >> function
-                | Some value when Args.downloadMinorOnly && Args.downloadPatchOnly ->
-                    currentElectronVersion.Major = value.Major
-                    && (currentElectronVersion.Minor < value.Minor
-                        || (currentElectronVersion.Minor = value.Minor
-                            && currentElectronVersion.Patch < value.Patch))
-                | Some value when Args.downloadMinorOnly ->
-                    currentElectronVersion.Major = value.Major
-                    && currentElectronVersion.Minor < value.Minor
-                | Some value when Args.downloadPatchOnly ->
-                    currentElectronVersion.Major = value.Major
-                    && currentElectronVersion.Minor = value.Minor
-                    && currentElectronVersion.Patch < value.Patch
-                | _ -> false
-        )
-        |> function
-            | [] -> Electron.tryGetReleaseFromString (Status.getCache().tagName)
-            | releases ->
-                releases
-                |> List.maxBy _.createdAt
-                |> _.tagName
-                |> Electron.tryGetReleaseFromString
-        |> function
-            | Some release ->
-                Status.setRelease release
-                Electron.downloadRelease release
-            | None -> failwith "Was not able to identify the latest release using the 'gh' cli."
-    | _ ->
-        Electron.tryGetRelease _.isLatest
-        |> function
-            | Some release ->
-                Status.setRelease release
-                Electron.downloadRelease release
-            | None -> failwith "Was not able to identify the latest release using the 'gh' cli."
-
-Target.create Ops.postDownload (ignore >> Laundry.clean)
 
 Target.create Ops.generate
 <| fun _ ->
@@ -164,18 +59,6 @@ Target.create Ops.test
 Target.create Ops.postTest (ignore >> Laundry.fableClean)
 Target.create Ops.restore (ignore >> Laundry.restoreTools)
 Target.create Ops.format (ignore >> Laundry.format)
-
-// This target doesn't necessarily need to run anything itself. It acts to a sign post
-// to target with a specific dependency list
-Target.create Ops.cron ignore
-
-Target.create Ops.loadCache
-<| fun _ ->
-    if File.exists Files.Cache then
-        File.readAsString Files.Cache
-        |> JsonSerializer.Deserialize<ReleaseInfo>
-        |> Status.setCache
-
 //%gitnet1%START%
 Target.create Ops.gitnet
 <| fun para ->
