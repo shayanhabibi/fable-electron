@@ -4,8 +4,6 @@ title: Build System
 
 
 import raw from '!!raw-loader!../../../../ci/Spec.fs';
-import rawBuild from '!!raw-loader!../../../../ci/Build.fs';
-import gitnetRaw from '!!raw-loader!../../../../ci/lib/GitNet.fs';
 import GetRegion from '@site/src/components/LineRegions';
 import CodeBlock from '@theme/CodeBlock';
 
@@ -302,7 +300,7 @@ flowchart LR
 config:
   layout: dagre
 ---
-flowchart 
+flowchart
  subgraph s2["currentElectronVersion"]
         n2["ProjectFile"]
         n3["Property ElectronVersion"]
@@ -417,18 +415,18 @@ stateDiagram-v2
             GenerateReleaseNotes --> StageFiles2
             StageFiles2 --> CommitFiles2
             state isPullGen <<choice>>
-            CommitFiles --> isPullGen: packageRequiresPull 
+            CommitFiles --> isPullGen: packageRequiresPull
             isPullGen --> GenerateReleaseNotes: True
             isPullGen --> CommitTags: False
             state isPull <<choice>>
             CommitFiles2 --> PushBranch
-            PushBranch --> isPull: packageRequiresPull 
+            PushBranch --> isPull: packageRequiresPull
             isPull --> CreatePull: True
             isPull --> PackAndPush: False
             CreatePull --> [*]
             PackAndPush --> [*]
         }
-        
+
     }
     major --> eVersDiff
     minor --> eVersDiff
@@ -448,7 +446,7 @@ stateDiagram-v2
     pulled --> ElectronVersionUpdated
 ```
 <details>
- <summary>{'5. Branching workflow based on compound booleans'}</summary>   
+ <summary>{'5. Branching workflow based on compound booleans'}</summary>
 <CodeBlock language={'fsharp'}>{GetRegion(rawBuild, 'gitnet5')}</CodeBlock>
 </details>
 

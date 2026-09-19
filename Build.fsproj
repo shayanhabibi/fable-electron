@@ -2,7 +2,6 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net9.0</TargetFramework>
-<!--        <IsPackable>false</IsPackable>-->
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>fable-electron</ToolCommandName>
         <PackageOutputPath>./bin</PackageOutputPath>
@@ -10,35 +9,16 @@
     <ItemGroup>
       <Content Include="ci\cache.json" />
       <Compile Include="ci\Spec.fs" />
-      <Compile Include="ci\lib\GhClient.fs" />
-      <Compile Include="ci\lib\Electron.fs" />
-      <Compile Include="ci\lib\GitNet.fs" />
-      <Compile Include="ci\lib\Workers.fs" />
-      <Compile Include="ci\lib\TargetOperators.fs" />
-      <Compile Include="ci\Build.fs" />
       <Content Include="ci\README.md" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="EasyBuild.FileSystemProvider" Version="1.1.0" />
-      <PackageReference Include="EasyBuild.Tools" Version="5.0.1" />
-      <PackageReference Include="Fake.Api.GitHub" Version="6.1.4" />
-      <PackageReference Include="Fake.Core.Target" Version="6.1.4" />
-      <PackageReference Include="Fake.Core.UserInput" Version="6.1.4" />
-      <PackageReference Include="Fake.DotNet.Cli" Version="6.1.4" />
-      <PackageReference Include="Fake.DotNet.Fsdocs" Version="6.1.4" />
-      <PackageReference Include="Fake.JavaScript.Npm" Version="6.1.4" />
-      <PackageReference Include="Fake.Tools.Git" Version="6.1.4" />
+      <PackageReference Include="Partas.Build" Version="0.6.2" />
       <PackageReference Include="Partas.Build.Baked" Version="0.1.1" />
-      <PackageReference Include="Partas.Build.Cmd" Version="0.2.1" />
+      <PackageReference Include="Partas.Build.Cmd" Version="0.3.1" />
       <PackageReference Include="Partas.GitNet" Version="3.0.0" />
-        <PackageReference Include="FSharp.Core" Version="10.1.203" />
-        <PackageReference Update="FSharp.Core" Version="10.1.203" />
-        <PackageReference Include="Partas.TypeProvider.BuildHelper" Version="0.2.5" />
+      <PackageReference Include="Partas.TypeProvider.BuildHelper" Version="0.2.5" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="src\ElectronApi.Json.Parser\ElectronApi.Json.Parser.fsproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="obj\" />
     </ItemGroup>
 </Project>
