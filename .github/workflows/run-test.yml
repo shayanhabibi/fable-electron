@@ -1,6 +1,5 @@
-﻿name: Test Packages
+name: Test Packages
 # This will run tests only for branches which are making a pull request to main and develop.
-# Ensure any workflow in FAKE runs `post` cleans AFTER the test has run.
 on:
   workflow_call: 
   workflow_dispatch:
@@ -39,5 +38,5 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         
-      - name: Run FAKE CI
-        run: dotnet run -- test
+      - name: Run tests
+        run: dotnet run --project ci/Build.fsproj -- test --npm-ci

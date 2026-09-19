@@ -10,6 +10,7 @@ open Partas.Build
 open Partas.Build.ErrorHandling
 open Partas.TypeProvider.BuildHelper.Runtime.Project
 
+//%FileProvider%START%
 [<Literal>]
 let __ROOT_DIRECTORY__ = __SOURCE_DIRECTORY__ + "/.."
 /// Files/paths that are not guaranteed (may be cleaned out of existence)
@@ -24,6 +25,7 @@ let __VIRTUAL_DIRECTORY__ = "
 "
 /// Type provider which provides design time hints for runtime values
 type Repo = BuildHelperProvider<__ROOT_DIRECTORY__, __VIRTUAL_DIRECTORY__, capabilityFullOverride = true>
+//%FileProvider%END%
 
 /// The shape of data returned from <c>gh</c> cli when we request release info in json
 [<Struct>]
@@ -123,6 +125,7 @@ module Versions =
                 "generated: true"
             ]
             |> String.concat "\n"
+//%ElectronDeltaTypes%START%
 /// <summary>
 /// The different version sources used when calculating
 /// the semver change type and value for electron.
@@ -157,7 +160,9 @@ type ElectronDelta = {
     Minor: int
     Patch: int
 }
+//%ElectronDeltaTypes%END%
 
+//%Projects%START%
 module Projects =
     let allProjects = Repo.Project.AllProjects()
     /// Only projects located under src/
@@ -170,19 +175,23 @@ module Projects =
     let docs = allProjects |> List.find _.Name.Equals("Docs")
     /// Only the build project
     let build = allProjects |> List.find _.Name.Equals("Build")
+//%Projects%END%
 
 module GitNet =
     /// Configuration for GitNet
     let config = {
         GitNetConfig.initFSharp with
             RepositoryPath = Repo.FileSystem.``.``.FullName
+//%GitNetIgnore%START%
             // These are the projects that are ignored for versioning
             // The GitNet system won't bother matching commits to files under their directories
             Projects.IgnoredProjects = Projects.allProjects |> List.except Projects.srcProjects |> List.map _.Name
+//%GitNetIgnore%END%
             // Whether gitnet should generate assembly files
             AssemblyFiles = AssemblyFileManagement.None
             // Whether gitnet should write updated versions to the project files directly
             WriteVersionToProjects = true
+//%GitNetBumps%START%
             Bump.DefaultBumpStrategy = ForceBumpStrategy.All
             // When you make a conventional commit the type is the first verb/adjective: "<type>[(<scope>)]: <summary>"
             // GitNet will match commits to the 'type' of bump they should cause.
@@ -193,6 +202,7 @@ module GitNet =
                 [ BumpMatcher.Type "breaking"; BumpMatcher.Type "remove" ]
             Bump.Mapping.Minor = [ BumpMatcher.Type "feat"; BumpMatcher.Type "new"; BumpMatcher.Type "add" ]
             Bump.Mapping.Patch = [ BumpMatcher.Type "fix"; BumpMatcher.Type "update"; BumpMatcher.Type "change" ]
+//%GitNetBumps%END%
             // Whether the output changelog/release-notes will include non-conventional commits
             Output.AllowUnconventional = false
             // The output changelog/release-notes groups commits into different categories.
@@ -234,10 +244,12 @@ module GitNet =
                 IgnoreCommit.SkipCi
             ]
     }
+//%GitNetInit%START%
     let runtime = Producer.emptyDefine "initial runtime" (new GitNetRuntime(config) |> Operation.ret)
     /// We do a gitnet dry run - this doesn't write any versions to files, make any commits/tags etc
     /// and provides us the calculated changes that would have occurred
     let initialCompute = DependencySpec.require runtime |> DependencySpec.map _.DryRun()
+//%GitNetInit%END%
     let private getInitialVersion scope =
         initialCompute
         |> DependencySpec.map (fun initialCompute ->
@@ -364,6 +376,7 @@ module Electron =
                 Flags.Overwrite = overwrite
         })
 
+//%ElectronDeltaRules%START%
 module ElectronDelta =
     /// Determine the delta kind from a given electron delta
     let deltaKind = function
@@ -401,9 +414,11 @@ module ElectronDelta =
         | _, Versions.Patch
         | { Dirty = true }, _ -> delta.Versions.FableElectronPackage |> makeSepochSemver |> SepochSemver.bumpPatch
         | _ -> delta.Versions.FableElectronPackage |> makeSepochSemver
+//%ElectronDeltaRules%END%
 
 /// CLI flags/options for running operations in this repository/project
 module Options =
+//%Options%START%
     let quick =
         Input.option<bool> "--quick"
         |> Input.alias "-q"
@@ -414,6 +429,7 @@ module Options =
         |> Input.arity ExactlyOne
         |> InputSpec.ofInput
         |> InputSpec.map (Option.map Semver.SemVersion.Parse)
+//%Options%END%
     let cache =
         Input.option<bool> "--cache-release"
         |> Input.desc "Target the release specified in the cache"
@@ -474,6 +490,7 @@ module Inputs =
                 |> Some
         })
         |> Producer.emptyDefine "fetch cache"
+//%ReleaseProducer%START%
     /// asynchronously retrieves the release info for either the requested release/bump type
     /// from the electron repo using the gh cli. consider this to be the requested release info
     /// we are generating against. Falls back to the 'latest' release if none are specifically
@@ -521,6 +538,7 @@ module Inputs =
                     | values -> List.maxBy _.createdAt values |> Some
                 })
             )
+//%ReleaseProducer%END%
     /// Asynchronously downloads the electron api file for the requested release
     let downloadApi =
         Producer.define
@@ -763,6 +781,7 @@ module Stage =
             }
         }
     }
+//%GenerateStage%START%
     /// Generates the Fable.Electron bindings from temp/electron-api.json, downloading it first when absent
     let generate = stage "generate" {
         consumes (DependencySpec.require Inputs.downloadApi) (fun () ->
@@ -776,6 +795,7 @@ module Stage =
             })
         )
     }
+//%GenerateStage%END%
     /// Prints the versions and bumps the run has calculated
     let echoStatus = stage "status" {
         consumes Inputs.initialGitStatus (fun status ->
@@ -825,6 +845,7 @@ Package Requires Pull: {status.requiresPull}
             | [] -> defaults
             | projects -> projects
             )
+//%BuildStage%START%
     /// Builds projects
     let build = input {
         let! projects = targetProjects Projects.srcProjects
@@ -844,6 +865,7 @@ Package Requires Pull: {status.requiresPull}
             }
         }
     }
+//%BuildStage%END%
     /// Builds fable projects
     let fableBuild = input {
         let! projects =
@@ -960,6 +982,7 @@ Otherwise, you can locally install the tool using `dotnet tool install --source 
 # WARNING - do not commit/push the dotnet-tools.json changes.
 """
     }
+//%ReleaseStage%START%
     /// <summary>
     /// The versioning, commit, tag, publish and pull request steps of a scheduled generation, decided from
     /// the status the run calculated before it began.
@@ -1081,7 +1104,9 @@ Otherwise, you can locally install the tool using `dotnet tool install --source 
             }
         }
     }
+//%ReleaseStage%END%
 
+//%GenerationFailures%START%
 /// Records the failures of the generation stages ahead of the release, so the pull request can carry them.
 let private generationFailures = ResizeArray<string>()
 let private recordFailure (context: FailureContext) =
@@ -1089,16 +1114,20 @@ let private recordFailure (context: FailureContext) =
     let own = context.Failures |> List.map (fun failure -> context.Scope, failure)
     for scope, failure in own @ nested do
         generationFailures.Add $"{scope}: {FailureCause.describe failure.Cause}"
+//%GenerationFailures%END%
 
+//%Cli%START%
 [<EntryPoint>]
 let main argv = rootCommand argv {
     description "The Fable.Electron build and CI tool"
+//%CliBuild%START%
     command "build" {
         description "Build projects"
         Stage.restoreTools
         Stage.clean
         Stage.build
     }
+//%CliBuild%END%
 
     command "test" {
         description "Run the electron test application headless, or with --watch / --windowed"
@@ -1190,6 +1219,7 @@ let main argv = rootCommand argv {
         Stage.packTool
     }
 
+//%CliCron%START%
     command "cron" {
         description "The scheduled generation: download the latest release, generate, build, test, then version, commit and publish or open a pull request"
         Stage.githubAuth
@@ -1208,4 +1238,6 @@ let main argv = rootCommand argv {
         Stage.release generationFailures
         Stage.cleanTemp
     }
+//%CliCron%END%
 }
+//%Cli%END%

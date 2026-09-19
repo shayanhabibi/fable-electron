@@ -1,5 +1,4 @@
 name: Scheduled Binding Generator
-# Ensure any workflow in FAKE runs `post` cleans AFTER the test has run.
 on:
   workflow_call:
   workflow_dispatch:
@@ -55,5 +54,5 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         
-      - name: Run FAKE CI
-        run: dotnet run -- cron --nuget-key ${{ env.NUGET_KEY }} --gh-key ${{ secrets.GITHUB_TOKEN }} --npm-ci
+      - name: Run CI
+        run: dotnet run --project ci/Build.fsproj -- cron --nuget-key ${{ env.NUGET_KEY }} --gh-key ${{ secrets.GITHUB_TOKEN }} --npm-ci

@@ -1,26 +1,18 @@
 name: Test Build System
-# This workflow only operates when there are changes to the CLI build system,
-# or its test.
-# It does not utilise the FAKE build system, but runs expecto tests
+# Smoke tests the CLI build system on changes to it: compiles it and resolves every command's stage tree.
 on:
   push:
     branches:
       - main
       - develop
     paths:
-      - 'Build.fsproj' # include the proj file
-      - 'ci/**.fs' # include the build system files 
-      - 'tests/Build.Tests/**.fs' # Include the build system tests
-      - 'tests/Build.Tests/Build.Tests.fsproj' # Include the build system proj file
+      - 'ci/**'
   pull_request:
     branches:
       - main
       - develop
     paths:
-      - 'Build.fsproj' # include the proj file
-      - 'ci/**.fs' # include the build system files 
-      - 'tests/Build.Tests/**.fs' # Include the build system tests
-      - 'tests/Build.Tests/Build.Tests.fsproj' # Include the build system proj file
+      - 'ci/**'
   
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
@@ -34,7 +26,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  run-build-ci-tests:
+  smoke-test-build-cli:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -49,9 +41,12 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         
-      - name: Restore Tools
-        run: dotnet tool restore
-        
-      - name: Run tests
-        working-directory: ./tests/Build.Tests
-        run: dotnet run -- --summary --colours 256 --no-spinner
+      - name: Build CLI
+        run: dotnet build ci/Build.fsproj -c Release
+
+      - name: Explain commands
+        run: |
+          dotnet run --project ci/Build.fsproj --no-build -c Release -- --help
+          for cmd in build test generate pack publish format cron; do
+            dotnet run --project ci/Build.fsproj --no-build -c Release -- $cmd --explain
+          done

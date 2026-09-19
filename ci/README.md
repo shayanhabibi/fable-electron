@@ -5,9 +5,9 @@ It uses the `gh` cli to list and download electron release assets, targeting the
 requested with `--release`.
 
 ```shell
-dotnet run -- --help              # every command
-dotnet run -- <command> --help    # the options that command's stages read
-dotnet run -- <command> --explain # the resolved stage tree, running nothing
+dotnet run --project ci/Build.fsproj -- --help              # every command
+dotnet run --project ci/Build.fsproj -- <command> --help    # the options that command's stages read
+dotnet run --project ci/Build.fsproj -- <command> --explain # the resolved stage tree, running nothing
 ```
 
 | Command | What it runs |
@@ -37,7 +37,6 @@ current branch.
 
 ## Organisation
 
-`Build.fsproj` sits at the repository root so `dotnet run` works from there; its source lives in `ci/`. That
-location has a cost: the SDK's default item globs walk the whole repository, `node_modules` included, before
-the tool starts. Moving the project into its own directory brings `dotnet run` down from about thirteen seconds
-to about two, at the price of updating the workflows that call it.
+The project lives in `ci/` so the SDK's item globs do not walk the whole repository before the tool starts.
+Run it from the repository root with `dotnet run --project ci/Build.fsproj -- <command>`, or with `dotnet run -- <command>`
+from inside `ci/`.
